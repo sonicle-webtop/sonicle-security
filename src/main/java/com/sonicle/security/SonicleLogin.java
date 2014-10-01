@@ -86,26 +86,26 @@ public class SonicleLogin {
             if (authuri!=null) {
 				// Portare tutto nel costruttore dell' AuthenticationDomain???
                 ad=new AuthenticationDomain(iddomain,description,domain,authuri,adminuser,adminpassword,order,enabled,casesensitive,autocreation,advsecurity);
-                String authuriprotocol=ad.getAuthUriProtocol();
-                if (authuriprotocol.startsWith("ldap")) authuriprotocol="ldap";
-                rs=stmt.executeQuery("select classname from authenticationclasses where authuriprotocol='"+authuriprotocol+"'");
-                String classname=null;
-                if (rs.next()) classname=rs.getString("classname");
-                if (classname!=null) {
+                String authUriProtocol=ad.getAuthUriProtocol();
+                if (authUriProtocol.startsWith("ldap")) authUriProtocol="ldap";
+                rs=stmt.executeQuery("select class_name from authentication_classes where auth_uri_protocol='"+authUriProtocol+"'");
+                String className=null;
+                if (rs.next()) className=rs.getString("class_name");
+                if (className!=null) {
                     try {
-                        Class aclass=Class.forName(classname);
+                        Class aclass=Class.forName(className);
                         Object o=aclass.newInstance();
                         if (o instanceof Authenticator) {
                             ad.setAuthenticatorClass(aclass);
                             authenticator=(Authenticator)o;
                         } else {
-                            throw new RuntimeException("Class "+classname+" does not implement the Authenticator interface");
+                            throw new RuntimeException("Class "+className+" does not implement the Authenticator interface");
                         }
                     } catch(Exception exc) {
                         throw new RuntimeException("Unsupported authentication uri \""+authuri+"\"",exc);
                     }
                 } else {
-                    throw new RuntimeException("Authentication class not found for \""+authuriprotocol+"\"");
+                    throw new RuntimeException("Authentication class not found for \""+authUriProtocol+"\"");
                 }
             }
         } catch(SQLException exc) {

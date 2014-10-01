@@ -43,16 +43,16 @@ public class WebTopAuthenticator extends Authenticator {
             stmt=con.createStatement();
             String sql=null;
             if (username.equals("admin")) {
-                sql="select password, passwordtype from users "+
+                sql="select password, password_type from users "+
                     "where login='"+username+"'";
             } else {
-                sql="select password, passwordtype from users "+
-                    "where iddomain='"+getAuthenticationDomain().getIDDomain()+"' and login='"+username+"'";
+                sql="select password, password_type from users "+
+                    "where domain_id='"+getAuthenticationDomain().getIDDomain()+"' and login='"+username+"'";
             }
             rs=stmt.executeQuery(sql);
             if (rs.next()) {
                 String credential=rs.getString("password");
-                CredentialAlgorithm algorithm=CredentialAlgorithm.valueOf(rs.getString("passwordtype"));
+                CredentialAlgorithm algorithm=CredentialAlgorithm.valueOf(rs.getString("password_type"));
                 result=Credentials.compare(credential,algorithm,password);
                 if (result) {
                     principal.setCredential(credential);
