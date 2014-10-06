@@ -36,18 +36,20 @@ public class WebTopAuthenticator extends Authenticator {
         ResultSet rs=null;
         boolean result=false;
         String password=principal.getPassword();
-        String username=principal.getUser();
+        String username=principal.getSubjectId();
         try {
 			con=ds.getConnection();
             System.out.println("WebTopAuthenticator: Connection="+con);
             stmt=con.createStatement();
             String sql=null;
-            if (username.equals("admin")) {
+			String iddomain=getAuthenticationDomain().getIDDomain();
+			boolean isadmin=username.equals("admin");
+            if (isadmin) {
                 sql="select password, password_type from users "+
                     "where user_id='"+username+"'";
             } else {
                 sql="select password, password_type from users "+
-                    "where domain_id='"+getAuthenticationDomain().getIDDomain()+"' and user_id='"+username+"'";
+                    "where domain_id='"+iddomain+"' and user_id='"+username+"'";
             }
             rs=stmt.executeQuery(sql);
             if (rs.next()) {
@@ -57,6 +59,16 @@ public class WebTopAuthenticator extends Authenticator {
                 if (result) {
                     principal.setCredential(credential);
                     principal.setCredentialAlgorithm(algorithm);
+					
+					if (!isadmin) {
+						rs.close();
+						sql="select group_id, description from groups where domain_id='"+iddomain+"' and group_id in (select group_id from users_groups where domain_id='"+iddomain+"' and user_id='"+username+"')";
+						rs=stmt.executeQuery(sql);
+						while(rs.next()) {
+							GroupPrincipal group=new GroupPrincipal(rs.getString("group_id"),rs.getString("description"));
+							principal.addGroup(group);
+						}
+					}
                 }
             }
         } catch(Exception exc) {

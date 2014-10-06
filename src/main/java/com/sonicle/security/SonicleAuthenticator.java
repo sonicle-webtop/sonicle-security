@@ -63,7 +63,7 @@ public class SonicleAuthenticator extends Authenticator {
         ResultSet rs=null;
         boolean result=false;
         String password=principal.getPassword();
-        String username=principal.getUser();
+        String username=principal.getSubjectId();
         try {
             con=datasource.getConnection();
             //System.out.println("SonicleAuthenticator: Connection="+con);

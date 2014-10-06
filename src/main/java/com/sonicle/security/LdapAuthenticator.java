@@ -67,7 +67,7 @@ public class LdapAuthenticator extends Authenticator {
 
         try {
             String password=principal.getPassword();
-            String username=principal.getUser();
+            String username=principal.getSubjectId();
             AuthenticationDomain ad=getAuthenticationDomain();
             String dc2=null;
             String dc1=null;

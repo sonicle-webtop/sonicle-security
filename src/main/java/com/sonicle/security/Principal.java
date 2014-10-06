@@ -21,7 +21,7 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class Principal implements java.security.Principal, Serializable {
 
-	private String user = null;
+	private String subject_id = null;
 	private String domainId = null;
 	private String name = null;
 	private String hashedName = null;
@@ -31,33 +31,35 @@ public class Principal implements java.security.Principal, Serializable {
 	private String credential = null;
 	private CredentialAlgorithm algorithm = null;
 	private AuthenticationDomain ad;
+	
+	private ArrayList<GroupPrincipal> groups=new ArrayList<>();
 
-	public Principal(String user, AuthenticationDomain ad, String desc) {
+	public Principal(String user_id, AuthenticationDomain ad, String desc) {
 
 		if (ad != null) {
 			this.ad = ad;
 			if (!ad.isAuthCaseSensitive()) {
-				user = user.toLowerCase();
+				user_id = user_id.toLowerCase();
 			}
 			String dsuffix = "@" + ad.getDomain();
-			if (user.endsWith(dsuffix)) {
-				int ix = user.lastIndexOf(dsuffix);
-				user = user.substring(0, ix);
+			if (user_id.endsWith(dsuffix)) {
+				int ix = user_id.lastIndexOf(dsuffix);
+				user_id = user_id.substring(0, ix);
 			}
 			this.domainId = ad.getIDDomain();
-			this.name = user + "@" + domainId;
+			this.name = user_id + "@" + domainId;
 			this.hashedName = DigestUtils.md5Hex(this.name);
-			this.fullName = MessageFormat.format("{0}@{1}", user, ad.getDomain());
+			this.fullName = MessageFormat.format("{0}@{1}", user_id, ad.getDomain());
 		} else {
-			this.name = user;
+			this.name = user_id;
 		}
-		this.user = user;
+		this.subject_id = user_id;
 
 		this.description = desc;
 	}
 	
-	public String getUser() {
-		return user;
+	public String getSubjectId() {
+		return subject_id;
 	}
 
 	public String getDomainId() {
@@ -113,6 +115,14 @@ public class Principal implements java.security.Principal, Serializable {
 
 	public String getFullName() {
 		return this.fullName;
+	}
+	
+	public void addGroup(GroupPrincipal group) {
+		groups.add(group);
+	}
+	
+	public ArrayList<GroupPrincipal> getGroups() {
+		return groups;
 	}
 
 	public String toString() {

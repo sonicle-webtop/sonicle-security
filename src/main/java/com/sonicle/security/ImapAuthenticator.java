@@ -48,7 +48,7 @@ public class ImapAuthenticator extends Authenticator {
 
         try {
             String password=principal.getPassword();
-            String username=principal.getUser();
+            String username=principal.getSubjectId();
             Session session=Session.getDefaultInstance(props, null);
             IMAPStore store;
             URLName url=new URLName((ssl?"imaps":"imap"),host,port,null,username,password);

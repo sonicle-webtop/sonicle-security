@@ -49,7 +49,7 @@ public class SonicleLogin {
             String adminuser=null;
             String adminpassword=null;
             int order=1;
-            boolean enabled=true;
+            Boolean enabled=null;
 			Boolean casesensitive = null;
 			Boolean autocreation = null;
 			Boolean advsecurity = null;
@@ -57,20 +57,18 @@ public class SonicleLogin {
 			con=datasource.getConnection();
             stmt=con.createStatement();
             if (iddomain!=null) {
-                rs=stmt.executeQuery("select * from domains where iddomain='"+iddomain+"'");
+                rs=stmt.executeQuery("select * from domains where domain_id='"+iddomain+"'");
                 if (rs.next()) {
                     description=rs.getString("description");
-                    domain=rs.getString("domain");
-                    authuri=rs.getString("authuri");
-                    adminuser=rs.getString("adminldap");
-                    adminpassword=rs.getString("passwordldap");
-                    order=rs.getInt("order");
-                    String senabled=rs.getString("enabled");
-                    if (senabled==null) enabled=true;
-                    else enabled=senabled.equals("T");
+                    domain=rs.getString("domain_name");
+                    authuri=rs.getString("auth_uri");
+                    adminuser=rs.getString("auth_username");
+                    adminpassword=rs.getString("auth_password");
+                    //order=rs.getInt("order");
+                    enabled=rs.getBoolean("enabled");
 					casesensitive = rs.getBoolean("case_sensitive_auth");
 					autocreation = rs.getBoolean("user_auto_creation");
-					advsecurity = rs.getBoolean("wt_adv_security");
+					advsecurity = rs.getBoolean("webtop_adv_security");
                 }
                 rs.close();
             } else {
@@ -122,7 +120,7 @@ public class SonicleLogin {
         principal.setPassword(new String(password));
         authenticator.setAuthenticationDomain(ad);
         authenticator.initialize(datasource);
-		if(!authenticator.validateUser(principal.getUser())) throw new LoginException("Bad login format");
+		if(!authenticator.validateUser(principal.getSubjectId())) throw new LoginException("Bad login format");
         if (!authenticator.authenticate(principal)) throw new LoginException("No principal found!");
         return principal;
     }
