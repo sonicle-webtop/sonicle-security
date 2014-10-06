@@ -29,7 +29,7 @@ public class SonicleLogin {
 		datasource = ds;
 	}
 
-    public java.security.Principal validateUser(String username, char password[]) throws LoginException {
+    public com.sonicle.security.Principal validateUser(String username, char password[]) throws LoginException {
         System.out.println("Validating user "+username);
         ArrayList<java.security.Principal> principals=null;
         String fullname=username;

@@ -44,10 +44,10 @@ public class WebTopAuthenticator extends Authenticator {
             String sql=null;
             if (username.equals("admin")) {
                 sql="select password, password_type from users "+
-                    "where login='"+username+"'";
+                    "where user_id='"+username+"'";
             } else {
                 sql="select password, password_type from users "+
-                    "where domain_id='"+getAuthenticationDomain().getIDDomain()+"' and login='"+username+"'";
+                    "where domain_id='"+getAuthenticationDomain().getIDDomain()+"' and user_id='"+username+"'";
             }
             rs=stmt.executeQuery(sql);
             if (rs.next()) {
