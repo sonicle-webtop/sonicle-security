@@ -53,9 +53,14 @@ public class AuthenticatorManager {
 	public final static Logger logger = (Logger) LoggerFactory.getLogger(AuthenticatorManager.class);
 	
 	public static final String AUTHENTICATORS_DESCRIPTOR_RESOURCE = "META-INF/sonicle-authenticators.xml";
-	private static final HashMap<String, String> authenticators = new HashMap<>();
 	
-	static {
+	private static AuthenticatorManager instance=null;
+	
+	private HashMap<String, String> authenticators = new HashMap<>();
+	
+	private AuthenticatorManager() {
+		System.out.println("***********************************************");
+		logger.debug("Initializing AuhenticatorManager");
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if (cl == null) cl = AuthenticatorManager.class.getClassLoader();
 		Enumeration<URL> enumResources = null;
@@ -65,11 +70,12 @@ public class AuthenticatorManager {
 			while(enumResources.hasMoreElements()) {
 				URL url = enumResources.nextElement();
 				XMLConfiguration config = new XMLConfiguration(url);
-				List<HierarchicalConfiguration> elAuthenticators = config.configurationsAt("authenticators");
+				logger.debug("Found configuration {}",url);
+				List<HierarchicalConfiguration> elAuthenticators = config.configurationsAt("authenticator");
 				for(HierarchicalConfiguration elAuthenticator : elAuthenticators) {
 					try {
-						String schema=(String)elAuthenticator.getProperty("schema");
-						String className=(String)elAuthenticator.getProperty("className");
+						String schema=elAuthenticator.getString("[@schema]");
+						String className=(String)elAuthenticator.getString("[@className]");
 						authenticators.put(schema, className);
 						logger.debug("Registered authenticator {}={}",schema,className);
 					} catch(Exception ex) {
@@ -82,8 +88,15 @@ public class AuthenticatorManager {
 		}
 	}
 	
+	public static synchronized AuthenticatorManager getInstance() {
+		if (instance==null) {
+			instance=new AuthenticatorManager();
+		}
+		return instance;
+	}
+	
 	public static String getAuthenticatorClassName(String schema) {
-		return authenticators.get(schema);
+		return getInstance().authenticators.get(schema);
 	}
 	
 }

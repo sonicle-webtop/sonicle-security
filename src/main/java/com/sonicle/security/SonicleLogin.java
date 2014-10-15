@@ -76,7 +76,7 @@ public class SonicleLogin {
                 }
             } else {
 //                fullname="admin@";
-//                iddomain="*";
+                domainId="*";
                 description="Administrators";
                 domain="local";
                 authuri="webtop";

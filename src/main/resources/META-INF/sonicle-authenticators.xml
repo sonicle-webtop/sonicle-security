@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <authenticators>
 	<authenticator schema="webtop" className="com.sonicle.security.WebTopAuthenticator" />
 	<authenticator schema="ldap"   className="com.sonicle.security.LdapAuthenticator" />
