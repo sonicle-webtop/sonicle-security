@@ -39,7 +39,7 @@ package com.sonicle.security;
  */
 public class GroupPrincipal extends Principal {
 	
-	public GroupPrincipal(String group_id, String desc) {
-		super(group_id,null,desc);
+	public GroupPrincipal(String group_id, AuthenticationDomain ad, String desc) {
+		super(group_id,ad,desc);
 	}	
 }

@@ -73,10 +73,11 @@ public class SonicleLogin {
                 rs.close();
             } else {
                 fullname="admin@";
-                iddomain="";
+                iddomain="*";
                 description="Administrators";
                 domain="local";
                 authuri="webtop";
+				enabled = true;
 				casesensitive = false;
 				autocreation = false;
 				advsecurity = false;

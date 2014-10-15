@@ -42,15 +42,18 @@ public class WebTopAuthenticator extends Authenticator {
             System.out.println("WebTopAuthenticator: Connection="+con);
             stmt=con.createStatement();
             String sql=null;
-			String iddomain=getAuthenticationDomain().getIDDomain();
-			boolean isadmin=username.equals("admin");
+			AuthenticationDomain ad=getAuthenticationDomain();
+			String iddomain=ad.getIDDomain();
+/*			boolean isadmin=username.equals("admin");
             if (isadmin) {
                 sql="select password, password_type from users "+
                     "where user_id='"+username+"'";
             } else {
                 sql="select password, password_type from users "+
                     "where domain_id='"+iddomain+"' and user_id='"+username+"'";
-            }
+            }*/
+			sql="select password, password_type from users "+
+				"where domain_id='"+iddomain+"' and user_id='"+username+"'";
             rs=stmt.executeQuery(sql);
             if (rs.next()) {
                 String credential=rs.getString("password");
@@ -60,15 +63,15 @@ public class WebTopAuthenticator extends Authenticator {
                     principal.setCredential(credential);
                     principal.setCredentialAlgorithm(algorithm);
 					
-					if (!isadmin) {
+//					if (!isadmin) {
 						rs.close();
-						sql="select group_id, description from groups where domain_id='"+iddomain+"' and group_id in (select group_id from users_groups where domain_id='"+iddomain+"' and user_id='"+username+"')";
+						sql="select group_id, description from groups where domain_id in ('"+iddomain+"','*') and group_id in (select group_id from users_groups where domain_id in ('"+iddomain+"','*') and user_id='"+username+"')";
 						rs=stmt.executeQuery(sql);
 						while(rs.next()) {
-							GroupPrincipal group=new GroupPrincipal(rs.getString("group_id"),rs.getString("description"));
+							GroupPrincipal group=new GroupPrincipal(rs.getString("group_id"),ad,rs.getString("description"));
 							principal.addGroup(group);
 						}
-					}
+//					}
                 }
             }
         } catch(Exception exc) {
