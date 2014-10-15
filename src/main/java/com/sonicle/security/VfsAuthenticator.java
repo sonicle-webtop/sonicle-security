@@ -49,7 +49,7 @@ public class VfsAuthenticator extends Authenticator {
             fo.close();
             vfsm.getFilesCache().clear(fo.getFileSystem());
         } catch(FileSystemException exc) {
-            exc.printStackTrace();
+			logger.error("Error authenticating",exc);
             String msg="Authentication failed for principal '"+fullname+"'";
 //            log.error(msg,exc);
             throw new CredentialException(msg);

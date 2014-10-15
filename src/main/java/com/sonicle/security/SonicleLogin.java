@@ -9,6 +9,9 @@
 
 package com.sonicle.security;
 
+import com.sonicle.commons.db.DbUtils;
+import com.sonicle.webtop.core.bol.ODomain;
+import com.sonicle.webtop.core.dal.DomainDAO;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +19,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -23,6 +28,8 @@ import javax.sql.DataSource;
  */
 public class SonicleLogin {
 
+	public final static Logger logger = (Logger) LoggerFactory.getLogger(SonicleLogin.class);
+	
     private DataSource datasource = null;
 	
 	public SonicleLogin(DataSource ds) {
@@ -30,18 +37,16 @@ public class SonicleLogin {
 	}
 
     public com.sonicle.security.Principal validateUser(String username, char password[]) throws LoginException {
-        System.out.println("Validating user "+username);
-        ArrayList<java.security.Principal> principals=null;
+        logger.debug("Validating user {}",username);
+        //ArrayList<java.security.Principal> principals=null;
         String fullname=username;
         int ix=username.lastIndexOf("@");
-        String iddomain=username.substring(ix+1);
+        String domainId=username.substring(ix+1);
         username=username.substring(0,ix);
-        if (username.equals("admin")) iddomain=null;
+        if (username.equals("admin")) domainId=null;
         String description=null;
         Authenticator authenticator=null;
 		Connection con=null;
-        Statement stmt=null;
-        ResultSet rs=null;
         AuthenticationDomain ad=null;
         try {
             String domain=null;
@@ -55,25 +60,23 @@ public class SonicleLogin {
 			Boolean advsecurity = null;
 			
 			con=datasource.getConnection();
-            stmt=con.createStatement();
-            if (iddomain!=null) {
-                rs=stmt.executeQuery("select * from domains where domain_id='"+iddomain+"'");
-                if (rs.next()) {
-                    description=rs.getString("description");
-                    domain=rs.getString("domain_name");
-                    authuri=rs.getString("auth_uri");
-                    adminuser=rs.getString("auth_username");
-                    adminpassword=rs.getString("auth_password");
-                    //order=rs.getInt("order");
-                    enabled=rs.getBoolean("enabled");
-					casesensitive = rs.getBoolean("case_sensitive_auth");
-					autocreation = rs.getBoolean("user_auto_creation");
-					advsecurity = rs.getBoolean("webtop_adv_security");
+            if (domainId!=null) {
+				ODomain odomain=DomainDAO.getInstance().selectById(con, domainId);
+                if (odomain!=null) {
+                    description=odomain.getDescription();
+                    domain=odomain.getDomainName();
+                    authuri=odomain.getAuthUri();
+                    adminuser=odomain.getAuthUsername();
+                    adminpassword=odomain.getAuthPassword();
+                    //order???
+                    enabled=odomain.getEnabled();
+					casesensitive = odomain.getCaseSensitiveAuth();
+					autocreation = odomain.getUserAutoCreation();
+					advsecurity = odomain.getWebtopAdvSecurity();
                 }
-                rs.close();
             } else {
-                fullname="admin@";
-                iddomain="*";
+//                fullname="admin@";
+//                iddomain="*";
                 description="Administrators";
                 domain="local";
                 authuri="webtop";
@@ -84,12 +87,10 @@ public class SonicleLogin {
             }
             if (authuri!=null) {
 				// Portare tutto nel costruttore dell' AuthenticationDomain???
-                ad=new AuthenticationDomain(iddomain,description,domain,authuri,adminuser,adminpassword,order,enabled,casesensitive,autocreation,advsecurity);
+                ad=new AuthenticationDomain(domainId,description,domain,authuri,adminuser,adminpassword,order,enabled,casesensitive,autocreation,advsecurity);
                 String authUriProtocol=ad.getAuthUriProtocol();
                 if (authUriProtocol.startsWith("ldap")) authUriProtocol="ldap";
-                rs=stmt.executeQuery("select class_name from authentication_classes where auth_uri_protocol='"+authUriProtocol+"'");
-                String className=null;
-                if (rs.next()) className=rs.getString("class_name");
+                String className=AuthenticatorManager.getAuthenticatorClassName(authUriProtocol);
                 if (className!=null) {
                     try {
                         Class aclass=Class.forName(className);
@@ -108,16 +109,14 @@ public class SonicleLogin {
                 }
             }
         } catch(SQLException exc) {
-            exc.printStackTrace();
+            logger.error("Error validating user {}",fullname,exc);
         } finally {
-            if (rs!=null) try { rs.close(); } catch(SQLException exc) {}
-            if (stmt!=null) try { stmt.close(); } catch(SQLException exc) {}
-			if (con!=null) try { con.close(); } catch(SQLException exc) {}
+			DbUtils.closeQuietly(con);
         }
         if (authenticator==null) return null;
 
         Principal principal=new Principal(username,ad,description);
-        System.out.println("Prepared principal "+principal);
+        logger.debug("Prepared principal {}",principal);
         principal.setPassword(new String(password));
         authenticator.setAuthenticationDomain(ad);
         authenticator.initialize(datasource);

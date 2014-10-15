@@ -9,7 +9,6 @@ import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPSearchResults;
-import java.sql.Connection;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 import javax.security.auth.login.LoginException;
@@ -101,7 +100,7 @@ public class LdapAuthenticator extends Authenticator {
             //ad.addProperty("mail.password", password);
             
         } catch(Exception exc) {
-          exc.printStackTrace();
+          logger.error("Error authenticating",exc);
         }
         return ret;
     }
@@ -124,8 +123,8 @@ public class LdapAuthenticator extends Authenticator {
                     }
                   }
             }
-        }catch(Exception ex){
-            ex.printStackTrace();
+        }catch(Exception exc){
+          logger.error("Error authenticating",exc);
         }
 
         return val;

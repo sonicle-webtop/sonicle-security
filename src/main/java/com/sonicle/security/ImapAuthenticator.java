@@ -61,7 +61,7 @@ public class ImapAuthenticator extends Authenticator {
             ad.addProperty("mail.username", username);
             ad.addProperty("mail.password", password);
         } catch(Exception exc) {
-          exc.printStackTrace();
+          logger.error("Error authenticating",exc);
         }
         return ret;
     }

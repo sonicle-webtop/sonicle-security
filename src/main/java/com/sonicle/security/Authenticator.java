@@ -9,9 +9,10 @@
 
 package com.sonicle.security;
 
-import java.sql.Connection;
 import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -19,6 +20,8 @@ import javax.sql.DataSource;
  */
 public abstract class Authenticator {
     
+	public final static Logger logger = (Logger) LoggerFactory.getLogger(Authenticator.class);
+	
     private AuthenticationDomain ad;
 	
 	public abstract void initialize(DataSource ds);
