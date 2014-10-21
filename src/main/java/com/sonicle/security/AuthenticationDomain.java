@@ -5,9 +5,15 @@
 
 package com.sonicle.security;
 
+import com.sonicle.commons.db.DbUtils;
 import java.io.Serializable;
 import java.util.Properties;
 import javax.sql.DataSource;
+import java.sql.Connection;
+import com.sonicle.webtop.core.dal.DomainDAO;
+import com.sonicle.webtop.core.bol.ODomain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,6 +21,8 @@ import javax.sql.DataSource;
  */
 public class AuthenticationDomain implements Serializable {
 
+	public final static Logger logger = (Logger) LoggerFactory.getLogger(AuthenticationDomain.class);
+	
     private String iddomain;
     private String remoteiddomain=null;
     private String description;
@@ -183,5 +191,37 @@ public class AuthenticationDomain implements Serializable {
         if (s!=null) b=s.equals("true");
         return b;
     }
+	
+	
+	public static AuthenticationDomain getInstance(Connection con, String domainId) {
+        AuthenticationDomain ad=null;
+        try {
+			ODomain odomain=DomainDAO.getInstance().selectById(con,domainId);
+            if (odomain!=null) {
+                String description=odomain.getDescription();
+                String domain=odomain.getDomainName();
+                String authuri=odomain.getAuthUri();
+                String adminuser=odomain.getAuthUsername();
+				String adminpassword="";
+				
+				// TODO: how to manage auth password here??
+                //String adminpassword=odomain.getAuthPassword();
+                //if (adminpassword!=null && adminpassword.length()>0) 
+                //    adminpassword=WebTopApp.decipher(adminpassword,"password");
+				
+                int order=1;
+                boolean enabled=odomain.getEnabled();
+				Boolean casesensitive = odomain.getCaseSensitiveAuth();
+				Boolean autocreation = odomain.getUserAutoCreation();
+				Boolean advsecurity = odomain.getWebtopAdvSecurity();
+                ad=new AuthenticationDomain(domainId, description, domain, authuri, adminuser, adminpassword, order, enabled, casesensitive, autocreation, advsecurity);
+            }
+        } catch(Exception exc) {
+			logger.error("Error fetching domain id={}",domainId,exc);
+        } finally {
+			DbUtils.closeQuietly(con);
+        }
+        return ad;
+	}
 
 }
