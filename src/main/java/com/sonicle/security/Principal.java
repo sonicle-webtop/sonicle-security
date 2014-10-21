@@ -21,11 +21,10 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class Principal implements java.security.Principal, Serializable {
 
-	private String subject_id = null;
 	private String domainId = null;
+	private String userId = null;
 	private String name = null;
 	private String hashedName = null;
-	private String fullName = null;
 	private String description = null;
 	private String password = null;
 	private String credential = null;
@@ -34,36 +33,65 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	private ArrayList<GroupPrincipal> groups=new ArrayList<>();
 
-	public Principal(String user_id, AuthenticationDomain ad, String desc) {
+	public Principal(String userId, AuthenticationDomain ad, String desc) {
 
 		if (ad != null) {
 			this.ad = ad;
 			if (!ad.isAuthCaseSensitive()) {
-				user_id = user_id.toLowerCase();
+				userId = userId.toLowerCase();
 			}
 			String dsuffix = "@" + ad.getDomain();
-			if (user_id.endsWith(dsuffix)) {
-				int ix = user_id.lastIndexOf(dsuffix);
-				user_id = user_id.substring(0, ix);
+			if (userId.endsWith(dsuffix)) {
+				int ix = userId.lastIndexOf(dsuffix);
+				userId = userId.substring(0, ix);
 			}
 			this.domainId = ad.getIDDomain();
-			this.name = user_id + "@" + domainId;
+			this.name = userId + "@" + domainId;
 			this.hashedName = DigestUtils.md5Hex(this.name);
-			this.fullName = MessageFormat.format("{0}@{1}", user_id, ad.getDomain());
 		} else {
-			this.name = user_id;
+			this.name = userId;
 		}
-		this.subject_id = user_id;
-
+		this.userId = userId;
 		this.description = desc;
 	}
 	
-	public String getSubjectId() {
-		return subject_id;
+	/**
+	 * Gets the user ID.
+	 * Note that in WebTop platform a user is uniquely recognized using
+	 * the composite identifier userId@domainId.
+	 * @return The user identifier.
+	 */
+	public String getUserId() {
+		return userId;
 	}
-
+	
+	/**
+	 * Gets the (WebTop) domain ID.
+	 * Note that in WebTop platform a user is uniquely recognized using
+	 * the composite identifier userId@domainId.
+	 * @return The domain identifier
+	 */
 	public String getDomainId() {
 		return domainId;
+	}
+	
+	/**
+	 * Gets the subject ID for Shiro calls.
+	 * This is an alias of getUserId method.
+	 * @return The user identifier.
+	 */
+	public String getSubjectId() {
+		return userId;
+	}
+	
+	/**
+	 * Gets the identifier that uniquely identify a user.
+	 * This is a composite field: userId@domainId.
+	 * @return The unique identifier.
+	 */
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	public String getDescription() {
@@ -105,16 +133,8 @@ public class Principal implements java.security.Principal, Serializable {
 		return ad;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public String getHashedName() {
 		return this.hashedName;
-	}
-
-	public String getFullName() {
-		return this.fullName;
 	}
 	
 	public void addGroup(GroupPrincipal group) {

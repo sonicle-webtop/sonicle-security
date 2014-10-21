@@ -43,7 +43,7 @@ public class WebTopAuthenticator extends Authenticator {
 			
 			AuthenticationDomain ad=getAuthenticationDomain();
 			String domainId=ad.getIDDomain();
-			OUser user=UserDAO.getInstance().selectById(con, domainId, userId);
+			OUser user=UserDAO.getInstance().selectByDomainUser(con, domainId, userId);
             if (user!=null) {
                 String credential=user.getPassword();
                 CredentialAlgorithm algorithm=CredentialAlgorithm.valueOf(user.getPasswordType());
