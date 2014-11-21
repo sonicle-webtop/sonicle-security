@@ -46,13 +46,17 @@ public class Principal implements java.security.Principal, Serializable {
 				userId = userId.substring(0, ix);
 			}
 			this.domainId = ad.getIDDomain();
-			this.name = userId + "@" + domainId;
+			this.name = Principal.buildName(this.domainId, userId);
 			this.hashedName = DigestUtils.md5Hex(this.name);
 		} else {
 			this.name = userId;
 		}
 		this.userId = userId;
 		this.description = desc;
+	}
+	
+	public static String buildName(String domainId, String userId) {
+		return userId + "@" + domainId;
 	}
 	
 	/**
