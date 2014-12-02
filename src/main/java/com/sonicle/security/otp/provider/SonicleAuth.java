@@ -24,6 +24,7 @@ public class SonicleAuth extends OTPProviderBase {
 	
 	public static final long DEFAULT_KEY_VALIDATION_INTERVAL = 60;
 
+	@Override
 	public String getName() {
 		return "TimeExpire";
 	}

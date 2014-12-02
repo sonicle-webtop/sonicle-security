@@ -47,7 +47,7 @@ public class Principal implements java.security.Principal, Serializable {
 			}
 			this.domainId = ad.getIDDomain();
 			this.name = Principal.buildName(this.domainId, userId);
-			this.hashedName = DigestUtils.md5Hex(this.name);
+			this.hashedName = Principal.buildHashedName(this.name);
 		} else {
 			this.name = userId;
 		}
@@ -57,6 +57,14 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	public static String buildName(String domainId, String userId) {
 		return userId + "@" + domainId;
+	}
+	
+	public static String buildHashedName(String name) {
+		return DigestUtils.md5Hex(name);
+	}
+	
+	public static String buildHashedName(String domainId, String userId) {
+		return buildHashedName(buildName(domainId, userId));
 	}
 	
 	/**
