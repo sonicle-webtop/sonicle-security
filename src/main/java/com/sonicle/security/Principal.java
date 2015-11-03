@@ -12,6 +12,9 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * This interface represents the abstract notion of a principal, which can be
@@ -46,7 +49,7 @@ public class Principal implements java.security.Principal, Serializable {
 				userId = userId.substring(0, ix);
 			}
 			this.domainId = ad.getIDDomain();
-			this.name = Principal.buildName(this.domainId, userId);
+			this.name = DomainAccount.buildName(this.domainId, userId);
 			this.hashedName = Principal.buildHashedName(this.name);
 		} else {
 			this.name = userId;
@@ -55,21 +58,17 @@ public class Principal implements java.security.Principal, Serializable {
 		this.description = desc;
 	}
 	
-	public static String buildName(String domainId, String userId) {
-		return userId + "@" + domainId;
-	}
-	
 	public static String buildHashedName(String name) {
 		return DigestUtils.md5Hex(name);
 	}
 	
 	public static String buildHashedName(String domainId, String userId) {
-		return buildHashedName(buildName(domainId, userId));
+		return buildHashedName(DomainAccount.buildName(domainId, userId));
 	}
 	
 	/**
 	 * Gets the user ID.
-	 * Note that in WebTop platform a user is uniquely recognized using
+	 * Remember that in WebTop platform a user is uniquely recognized using
 	 * the composite identifier userId@domainId.
 	 * @return The user identifier.
 	 */
@@ -79,7 +78,7 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	/**
 	 * Gets the (WebTop) domain ID.
-	 * Note that in WebTop platform a user is uniquely recognized using
+	 * Remember that in WebTop platform a user is uniquely recognized using
 	 * the composite identifier userId@domainId.
 	 * @return The domain identifier
 	 */
@@ -93,7 +92,7 @@ public class Principal implements java.security.Principal, Serializable {
 	 * @return The user identifier.
 	 */
 	public String getSubjectId() {
-		return userId;
+		return getUserId();
 	}
 	
 	/**
@@ -156,16 +155,39 @@ public class Principal implements java.security.Principal, Serializable {
 	public ArrayList<GroupPrincipal> getGroups() {
 		return groups;
 	}
+	
+	/*
+	public boolean isAdmin() {
+		return Principal.isAdmin(getName());
+	}
+	*/
 
 	public String toString() {
 		return "[name='" + getName() + "' - description='" + description + "']";
 	}
-
-	public boolean equals(Object o) {
-		if (!(o instanceof Principal)) {
-			return false;
-		}
-		return ((Principal) o).getName().equals(name);
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(name)
+			.toHashCode();
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Principal == false) return false;
+		if(this == obj) return true;
+		final Principal otherObject = (Principal) obj;
+		return new EqualsBuilder()
+			.append(name, otherObject.name)
+			.isEquals();
+	}
+	
+	public static boolean xisAdmin(String name) {
+		return StringUtils.equals(name, "admin@*");
+	}
+	
+	public static boolean xisAdmin(String domainId, String userId) {
+		return StringUtils.equals(domainId, "*") && StringUtils.equals(userId, "admin");
+	}
 }
