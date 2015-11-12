@@ -51,12 +51,6 @@ public class WebTopAuthenticator extends Authenticator {
                 if (result) {
                     principal.setCredential(credential);
                     principal.setCredentialAlgorithm(algorithm);
-					
-					List<OGroup> groups=GroupDAO.getInstance().selectByUser(con, domainId, userId);
-					for(OGroup group: groups) {
-						GroupPrincipal pgroup=new GroupPrincipal(group.getGroupId(),ad,group.getDescription());
-						principal.addGroup(pgroup);
-					}
                 }
             }
         } catch(Exception exc) {
