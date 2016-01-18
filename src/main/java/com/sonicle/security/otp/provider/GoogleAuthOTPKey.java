@@ -16,15 +16,14 @@ import java.util.List;
  * @author matteo
  */
 public class GoogleAuthOTPKey extends OTPKey {
-	
 	private static final String QR_URL_FORMAT = "https://www.google.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl={0}";
-	public static final String AUTHENTICATOR_URI_FORMAT = "otpauth://totp/{0}:{1}?secret={2}&issuer={3}";
+	public static final String AUTHENTICATOR_URI_FORMAT = "otpauth://totp/{0}?secret={1}&issuer={2}";
 	
 	private final List<Integer> scratchCodes;
 	
 	public GoogleAuthOTPKey(String secretKey, int code, List<Integer> scratchCodes) {
 		super(secretKey, code);
-		this.scratchCodes = new ArrayList<Integer>(scratchCodes);
+		this.scratchCodes = new ArrayList<>(scratchCodes);
 	}
 	
 	public List<Integer> getScratchCodes() {
@@ -36,6 +35,6 @@ public class GoogleAuthOTPKey extends OTPKey {
 	}
 	
 	public static String buildAuthenticatorURI(String issuer, String secret, String account) {
-		return MessageFormat.format(AUTHENTICATOR_URI_FORMAT, issuer, account, secret, issuer);
+		return MessageFormat.format(AUTHENTICATOR_URI_FORMAT, account, secret, issuer);
 	}
 }
