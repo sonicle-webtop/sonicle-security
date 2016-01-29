@@ -35,6 +35,13 @@ public class Principal implements java.security.Principal, Serializable {
 	private AuthenticationDomain ad;
 	
 	private ArrayList<GroupPrincipal> groups=new ArrayList<>();
+	
+	public Principal(String domainId, String userId) {
+		this.domainId = domainId;
+		this.userId = userId;
+		this.name = DomainAccount.buildName(this.domainId, userId);
+		this.hashedName = Principal.buildHashedName(this.name);
+	}
 
 	public Principal(String userId, AuthenticationDomain ad, String desc) {
 

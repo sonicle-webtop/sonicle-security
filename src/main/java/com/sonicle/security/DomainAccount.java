@@ -44,7 +44,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author malbinola
  */
 public class DomainAccount {
-	
 	private String domain;
 	private String user;
 	
@@ -56,7 +55,7 @@ public class DomainAccount {
 	public DomainAccount(String accountName) {
 		int at = StringUtils.lastIndexOf(accountName, "@");
 		if(at == -1) throw new UnsupportedOperationException(MessageFormat.format("Unable to parse specified account name {0}", accountName));
-		this.domain = StringUtils.substring(accountName, at);
+		this.domain = StringUtils.substring(accountName, at+1);
 		this.user = StringUtils.substring(accountName, 0, at);
 	}
 
