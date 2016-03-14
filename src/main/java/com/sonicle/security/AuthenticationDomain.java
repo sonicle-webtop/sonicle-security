@@ -124,6 +124,18 @@ public class AuthenticationDomain implements Serializable {
         return enabled;
     }
 	
+	public boolean isLdapAD() {
+		return getAuthUriProtocol().equals("ldapAD");
+	}
+	
+	public boolean isLdapOther() {
+		return getAuthUriProtocol().equals("ldapOther");
+	}
+	
+	public boolean isLdapWebtop() {
+		return getAuthUriProtocol().equals("ldapWebTop");
+	}
+	
 	public boolean isAuthCaseSensitive() {
 		return caseSensitiveAuth;
 	}
