@@ -85,6 +85,10 @@ public class DomainAccount {
 		user = Check.notNull(value);
 		return this;
 	}
+	
+	public boolean hasDomain(String domain) {
+		return StringUtils.equals(this.domain, domain);
+	}
 
 	@Override
 	public String toString() {
