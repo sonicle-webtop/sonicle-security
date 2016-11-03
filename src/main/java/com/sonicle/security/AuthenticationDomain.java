@@ -1,239 +1,86 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * sonicle-security is a helper library developed by Sonicle S.r.l.
+ * Copyright (C) 2014 Sonicle S.r.l.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by
+ * the Free Software Foundation with the addition of the following permission
+ * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY SONICLE, SONICLE DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301 USA.
+ *
+ * You can contact Sonicle S.r.l. at email address sonicle@sonicle.com
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License version 3.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
+ * reasonably feasible for technical reasons, the Appropriate Legal Notices must
+ * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-
 package com.sonicle.security;
 
-import com.sonicle.commons.db.DbUtils;
-import java.io.Serializable;
-import java.util.Properties;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import com.sonicle.webtop.core.dal.DomainDAO;
 import com.sonicle.webtop.core.bol.ODomain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  *
- * @author gbulfon
+ * @author malbinola
  */
-public class AuthenticationDomain implements Serializable {
-
-	public final static Logger logger = (Logger) LoggerFactory.getLogger(AuthenticationDomain.class);
+public class AuthenticationDomain {
+	private String domainId;
+	private String internetDomain;
+	private URI authUri;
+	private String authUsername;
+	private char[] authPassword;
 	
-    private String iddomain;
-    private String remoteiddomain=null;
-    private String description;
-    private String domain;
-    private String authuri;
-    private String adminuser;
-    private String adminpassword;
-    private int order;
-    private boolean enabled;
-	private Boolean caseSensitiveAuth;
-	private Boolean userAutoCreation;
-	private Boolean wtAdvancedSecurity;
-    private String authuriprotocol;
-    private String authuriresource;
-    private Class authenticatorClass;
-    private DataSource remotedatasource=null;
-    private Properties props=new Properties();
-
-    public AuthenticationDomain(String iddomain, String description, String domain, String authuri) {
-        this(iddomain,description,domain,authuri,null,null,1,true,true,false,false);        
-    }
-	
-	public AuthenticationDomain(String iddomain, String description, String domain, String authuri, String adminuser, String adminpassword, int order, boolean enabled) {
-		this(iddomain,description,domain,authuri,adminuser,adminpassword,order,enabled,true,false,false);
-	}
-    
-    public AuthenticationDomain(String iddomain, String description, String domain, String authuri, String adminuser, String adminpassword, int order, boolean enabled, Boolean caseSensitiveAuth, Boolean userAutoCreation, Boolean wtAdvancedSecurity) {
-        this.iddomain=iddomain;
-        this.description=description;
-        this.domain=domain;
-        this.authuri=authuri.trim();
-        this.adminuser=adminuser!=null?adminuser.trim():null;
-        this.adminpassword=adminpassword!=null?adminpassword.trim():null;
-        this.order=order;
-        this.enabled=enabled;
-		this.caseSensitiveAuth = caseSensitiveAuth;
-		this.userAutoCreation = userAutoCreation;
-		this.wtAdvancedSecurity = wtAdvancedSecurity;
-        
-        int ix=authuri.indexOf("://");
-        if (ix>0) {
-            authuriprotocol=authuri.substring(0,ix);
-            int ix2=ix+3;
-            if (authuri.length()>ix2)
-                authuriresource=authuri.substring(ix2);
-        }
-        else authuriprotocol=authuri;
-        //System.out.println("Authentication Domain : ");
-        //System.out.println(" iddomain="+iddomain);
-        //System.out.println(" description="+description);
-        //System.out.println(" domain="+domain);
-        //System.out.println(" authuri="+authuri);
-        //System.out.println(" authuriprotocol="+authuriprotocol);
-        //System.out.println(" authuriresource="+authuriresource);
-    }
-
-    public String getIDDomain() {
-        return iddomain;
-    }
-
-    public void setRemoteIDDomain(String id) {
-        remoteiddomain=id;
-    }
-
-    public String getRemoteIDDomain() {
-        return remoteiddomain;
-    }
-
-    public String getDataIDDomain() {
-        if (remoteiddomain==null) return iddomain;
-        return remoteiddomain;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public String getAuthUri() {
-        return authuri;
-    }
-    
-    public String getAdminUser() {
-        return adminuser;
-    }
-    
-    public String getAdminPassword() {
-        return adminpassword;
-    }
-    
-    public int getOrder() {
-        return order;
-    }
-    
-    public boolean isEnabled() {
-        return enabled;
-    }
-	
-	public boolean isLdapAD() {
-		return getAuthUriProtocol().equals("ldapAD");
+	public AuthenticationDomain(String domainId, String internetDomain, String authUri, String authUsername, char[] authPassword) throws URISyntaxException {
+		this.domainId = domainId;
+		this.internetDomain = internetDomain;
+		this.authUri = new URI(authUri);
+		this.authUsername = authUsername;
+		this.authPassword = authPassword;
 	}
 	
-	public boolean isLdapOther() {
-		return getAuthUriProtocol().equals("ldapOther");
-	}
-	
-	public boolean isLdapWebtop() {
-		return getAuthUriProtocol().equals("ldapWebTop");
-	}
-	
-	public boolean isAuthCaseSensitive() {
-		return caseSensitiveAuth;
-	}
-	
-	public boolean isAutoCreationEnabled() {
-		return userAutoCreation;
-	}
-	
-	public boolean isWTAdvSecurityEnabled() {
-		return wtAdvancedSecurity;
+	public AuthenticationDomain(ODomain domain) throws URISyntaxException {
+		this.domainId = domain.getDomainId();
+		this.internetDomain = domain.getDomainName();
+		this.authUri = new URI(domain.getAuthUri());
+		this.authUsername = domain.getAuthUsername();
+		if(domain.getAuthPassword() != null) this.authPassword = domain.getAuthPassword().toCharArray();
 	}
 
-    public String getAuthUriProtocol() {
-        return authuriprotocol;
-    }
-
-    public String getAuthUriResource() {
-        return authuriresource;
-    }
-
-    public void setAuthenticatorClass(Class c) {
-        this.authenticatorClass=c;
-    }
-
-    public Class getAuthenticatorClass() {
-        return authenticatorClass;
-    }
-
-    public void setRemoteDataSource(DataSource ds) {
-        remotedatasource=ds;
-    }
-
-    public DataSource getRemoteDataSource() {
-        return remotedatasource;
-    }
-
-    public void addProperty(String name, String value) {
-        props.put(name,value);
-    }
-
-    public void addProperty(String name, int value) {
-        props.put(name,""+value);
-    }
-
-    public void addProperty(String name, boolean value) {
-        props.put(name,""+value);
-    }
-
-    public String getProperty(String name, String defaultValue) {
-        String s=props.getProperty(name);
-        if (s==null) s=defaultValue;
-        return s;
-    }
-
-    public int getProperty(String name, int defaultValue) {
-        int n=defaultValue;
-        String s=props.getProperty(name);
-        if (s!=null) n=Integer.parseInt(s);
-        return n;
-    }
-
-    public boolean getProperty(String name, boolean defaultValue) {
-        boolean b=defaultValue;
-        String s=props.getProperty(name);
-        if (s!=null) b=s.equals("true");
-        return b;
-    }
-	
-	
-	public static AuthenticationDomain getInstance(Connection con, String domainId) {
-        AuthenticationDomain ad=null;
-        try {
-			ODomain odomain=DomainDAO.getInstance().selectById(con,domainId);
-            if (odomain!=null) {
-                String description=odomain.getDescription();
-                String domain=odomain.getDomainName();
-                String authuri=odomain.getAuthUri();
-                String adminuser=odomain.getAuthUsername();
-				String adminpassword="";
-				
-				// TODO: how to manage auth password here??
-                //String adminpassword=odomain.getAuthPassword();
-                //if (adminpassword!=null && adminpassword.length()>0) 
-                //    adminpassword=WebTopApp.decipher(adminpassword,"password");
-				
-                int order=1;
-                boolean enabled=odomain.getEnabled();
-				Boolean casesensitive = odomain.getCaseSensitiveAuth();
-				Boolean autocreation = odomain.getUserAutoCreation();
-				Boolean advsecurity = odomain.getWebtopAdvSecurity();
-                ad=new AuthenticationDomain(domainId, description, domain, authuri, adminuser, adminpassword, order, enabled, casesensitive, autocreation, advsecurity);
-            }
-        } catch(Exception exc) {
-			logger.error("Error fetching domain id={}",domainId,exc);
-        } finally {
-			DbUtils.closeQuietly(con);
-        }
-        return ad;
+	public String getDomainId() {
+		return domainId;
 	}
 
+	public String getInternetDomain() {
+		return internetDomain;
+	}
+
+	public URI getAuthUri() {
+		return authUri;
+	}
+
+	public String getAuthUsername() {
+		return authUsername;
+	}
+
+	public char[] getAuthPassword() {
+		return authPassword;
+	}
 }

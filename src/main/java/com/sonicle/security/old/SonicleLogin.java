@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import com.sonicle.commons.db.DbUtils;
 import com.sonicle.webtop.core.bol.ODomain;
@@ -36,7 +36,7 @@ public class SonicleLogin {
 		datasource = ds;
 	}
 
-    public com.sonicle.security.Principal validateUser(String username, char password[]) throws LoginException {
+    public Principal validateUser(String username, char password[]) throws LoginException {
         logger.debug("Validating user {}",username);
         //ArrayList<java.security.Principal> principals=null;
         String fullname=username;

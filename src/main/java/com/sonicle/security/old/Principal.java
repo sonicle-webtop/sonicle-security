@@ -6,9 +6,11 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -36,7 +38,35 @@ public class Principal implements java.security.Principal, Serializable {
 		this.domainId = domainId;
 		this.userId = userId;
 		this.password = password;
-	}	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	private String description = null;
+	
+	private String credential = null;
+	private CredentialAlgorithm algorithm = null;
+	private AuthenticationDomain ad;
+	
+	//private ArrayList<GroupPrincipal> groups=new ArrayList<>();
+	
+	
+	
+	
+	
+	 
+	
+	
+	
+	
+	
+	
+	
 	
 	public Principal(String domainId, String userId) {
 		this.domainId = domainId;
@@ -45,8 +75,26 @@ public class Principal implements java.security.Principal, Serializable {
 		this.hashedName = Principal.buildHashedName(this.name);
 	}
 
-	public AuthenticationDomain getAuthenticationDomain() {
-		return authenticationDomain;
+	public Principal(String userId, AuthenticationDomain ad, String desc) {
+
+		if (ad != null) {
+			this.ad = ad;
+			if (!ad.isAuthCaseSensitive()) {
+				userId = userId.toLowerCase();
+			}
+			String dsuffix = "@" + ad.getDomain();
+			if (userId.endsWith(dsuffix)) {
+				int ix = userId.lastIndexOf(dsuffix);
+				userId = userId.substring(0, ix);
+			}
+			this.domainId = ad.getIDDomain();
+			this.name = DomainAccount.buildName(this.domainId, userId);
+			this.hashedName = Principal.buildHashedName(this.name);
+		} else {
+			this.name = userId;
+		}
+		this.userId = userId;
+		this.description = desc;
 	}
 	
 	public static String buildHashedName(String name) {
@@ -116,12 +164,69 @@ public class Principal implements java.security.Principal, Serializable {
 		this.displayName = displayName;
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String desc) {
+		this.description = desc;
+	}
+
+	public void setPassword(String password) {
+		this.password = password.toCharArray();
+	}
+
+	public void setCredential(String credential) {
+		this.credential = credential;
+	}
+
+	public String getCredential() {
+		return credential;
+	}
+
+	public void setCredentialAlgorithm(CredentialAlgorithm algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	public CredentialAlgorithm getCredentialAlgorithm() {
+		return algorithm;
+	}
+
+//    public void setAuthenticationDomain(AuthenticationDomain ad) {
+//        this.ad=ad;
+//    }
+	public AuthenticationDomain getAuthenticationDomain() {
+		return ad;
+	}
+
 	public String getHashedName() {
 		return this.hashedName;
 	}
 	
+/*	public void addGroup(GroupPrincipal group) {
+		groups.add(group);
+	}
+	
+	public ArrayList<GroupPrincipal> getGroups() {
+		return groups;
+	}*/
+	
+	/*
+	public boolean isAdmin() {
+		return Principal.isAdmin(getName());
+	}
+	*/
+
 	public String toString() {
-		return "[name='" + getName() + "' - description='" + displayName + "']";
+		return "[name='" + getName() + "' - description='" + description + "']";
 	}
 	
 	@Override

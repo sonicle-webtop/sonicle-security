@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import com.sonicle.commons.db.DbUtils;
 import com.sonicle.webtop.core.bol.OGroup;

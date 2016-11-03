@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import com.novell.ldap.util.Base64;
 import java.io.IOException;

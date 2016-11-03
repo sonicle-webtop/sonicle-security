@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import com.sun.mail.imap.IMAPSSLStore;
 import com.sun.mail.imap.IMAPStore;

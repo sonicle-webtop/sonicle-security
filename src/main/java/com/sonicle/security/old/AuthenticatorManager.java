@@ -31,7 +31,7 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import java.net.URL;
 import java.util.ArrayList;

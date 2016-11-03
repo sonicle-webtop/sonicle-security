@@ -3,13 +3,12 @@
  * and open the template in the editor.
  */
 
-package com.sonicle.security;
+package com.sonicle.security.old;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPSearchResults;
-import com.sonicle.security.Principal;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.regex.Pattern;
