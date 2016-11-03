@@ -31,26 +31,37 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth.directory;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public abstract class AbstractDirectory implements Directory {
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
+	public AbstractConfigBuilder getConfigBuilder() {
+		return null;
 	}
 	
-	public String getKey() {
-		return this.key;
+	public boolean isReadOnly() {
+		return false;
 	}
 	
-	public int getVerificationCode() {
-		return this.verificationCode;
+	public static class UserEntry {
+		public String userId = null;
+		public String firstName = null;
+		public String lastName = null;
+		public String displayName = null;
+		public String email = null;
+		
+		public UserEntry() {}
+		
+		public UserEntry(String userId, String firstName, String lastName, String displayName, String email) {
+			this.userId = userId;
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.displayName = displayName;
+			this.email = email;
+		}
 	}
 }

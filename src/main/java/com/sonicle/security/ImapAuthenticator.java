@@ -47,7 +47,7 @@ public class ImapAuthenticator extends Authenticator {
         boolean ret=false;
 
         try {
-            String password=principal.getPassword();
+            String password=new String(principal.getPassword());
             String username=principal.getSubjectId();
             Session session=Session.getDefaultInstance(props, null);
             IMAPStore store;

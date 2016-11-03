@@ -36,7 +36,7 @@ public class WebTopAuthenticator extends Authenticator {
     public boolean authenticate(Principal principal) throws LoginException {
 		Connection con=null;
         boolean result=false;
-        String password=principal.getPassword();
+        String password=new String(principal.getPassword());
         String userId=principal.getSubjectId();
         try {
 			con=ds.getConnection();

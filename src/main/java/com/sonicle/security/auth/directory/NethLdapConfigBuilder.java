@@ -31,26 +31,16 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth.directory;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public class NethLdapConfigBuilder extends LdapConfigBuilder {
+	private static final NethLdapConfigBuilder BUILDER = new NethLdapConfigBuilder();
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
-	}
-	
-	public String getKey() {
-		return this.key;
-	}
-	
-	public int getVerificationCode() {
-		return this.verificationCode;
+	public static NethLdapConfigBuilder getInstance() {
+		return BUILDER;
 	}
 }

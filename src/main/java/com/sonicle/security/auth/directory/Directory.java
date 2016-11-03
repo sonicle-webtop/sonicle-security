@@ -31,26 +31,29 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth.directory;
+
+import com.sonicle.security.Principal;
+import com.sonicle.security.auth.DirectoryException;
+import com.sonicle.security.auth.EntryException;
+import com.sonicle.security.auth.directory.AbstractDirectory.UserEntry;
+import java.util.List;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public interface Directory {
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
-	}
-	
-	public String getKey() {
-		return this.key;
-	}
-	
-	public int getVerificationCode() {
-		return this.verificationCode;
-	}
+	public abstract String sanitizeUsername(DirectoryOptions opts, String username);
+	public abstract boolean validateUsername(DirectoryOptions opts, String username);
+	public abstract boolean validatePasswordPolicy(DirectoryOptions opts, char[] password);
+	public abstract Principal authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
+	public abstract List<UserEntry> listUsers(DirectoryOptions opts) throws DirectoryException;
+	public abstract void addUser(DirectoryOptions opts, UserEntry entry) throws EntryException, DirectoryException;
+	public abstract void updateUser(DirectoryOptions opts, UserEntry entry) throws DirectoryException;
+	public abstract void updateUserPassword(DirectoryOptions opts, String userId, char[] newPassword) throws DirectoryException;
+	public abstract void updateUserPassword(DirectoryOptions opts, String userId, char[] oldPassword, char[] newPassword) throws DirectoryException;
+	public abstract void deleteUser(DirectoryOptions opts, String userId) throws DirectoryException;
+	public abstract List<String> listGroups(DirectoryOptions opts) throws DirectoryException;
 }

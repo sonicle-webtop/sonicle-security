@@ -31,26 +31,57 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth.directory;
+
+import com.sonicle.commons.LangUtils;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public abstract class AbstractConfigBuilder {
+	private static final String IS_CASE_SENSITIVE = "isCaseSensitive";
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
+	public boolean getIsCaseSensitive(DirectoryOptions opts) {
+		return getBoolean(opts, IS_CASE_SENSITIVE, false);
 	}
 	
-	public String getKey() {
-		return this.key;
+	public void setIsCaseSensitive(DirectoryOptions opts, boolean isCaseSensitive) {
+		setParam(opts, IS_CASE_SENSITIVE, isCaseSensitive);
 	}
 	
-	public int getVerificationCode() {
-		return this.verificationCode;
+	protected Object getParam(DirectoryOptions opts, String name) {
+		return (opts == null) ? null : opts.getOption(name);
+	}
+	
+	protected void setParam(DirectoryOptions opts, String name, Object value) {
+		if(opts != null) opts.setOption(name, value);
+	}
+	
+	protected boolean hasParam(DirectoryOptions opts, String name) {
+		return (opts != null) && opts.hasOption(name);
+	}
+	
+	protected String getString(DirectoryOptions opts, String name, String defaultValue) {
+		String value = (String)getParam(opts, name);
+		return LangUtils.value(value, defaultValue);
+	}
+	
+	protected Boolean getBoolean(DirectoryOptions opts, String name, Boolean defaultValue) {
+		Boolean value = (Boolean) getParam(opts, name);
+		return LangUtils.value(value, defaultValue);
+	}
+	
+	protected boolean getBoolean(DirectoryOptions opts, String name, boolean defaultValue) {
+		return getBoolean(opts, name, (Boolean)defaultValue);
+	}
+	
+	protected Integer getInteger(DirectoryOptions opts, String name, Integer defaultValue) {
+		Integer value = (Integer) getParam(opts, name);
+		return LangUtils.value(value, defaultValue);
+	}
+	
+	protected int getInteger(DirectoryOptions opts, String name, int defaultValue) {
+		return getInteger(opts, name, (Integer)defaultValue);
 	}
 }

@@ -31,26 +31,56 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth;
+
+import com.sonicle.webtop.core.bol.ODomain;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public class AuthenticationDomain2 {
+	private String domainId;
+	private String internetDomain;
+	private URI authUri;
+	private String authUsername;
+	private char[] authPassword;
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
+	public AuthenticationDomain2(String domainId, String internetDomain, String authUri, String authUsername, char[] authPassword) throws URISyntaxException {
+		this.domainId = domainId;
+		this.internetDomain = internetDomain;
+		this.authUri = new URI(authUri);
+		this.authUsername = authUsername;
+		this.authPassword = authPassword;
 	}
 	
-	public String getKey() {
-		return this.key;
+	public AuthenticationDomain2(ODomain domain) throws URISyntaxException {
+		this.domainId = domain.getDomainId();
+		this.internetDomain = domain.getDomainName();
+		this.authUri = new URI(domain.getAuthUri());
+		this.authUsername = domain.getAuthUsername();
+		if(domain.getAuthPassword() != null) this.authPassword = domain.getAuthPassword().toCharArray();
 	}
-	
-	public int getVerificationCode() {
-		return this.verificationCode;
+
+	public String getDomainId() {
+		return domainId;
+	}
+
+	public String getInternetDomain() {
+		return internetDomain;
+	}
+
+	public URI getAuthUri() {
+		return authUri;
+	}
+
+	public String getAuthUsername() {
+		return authUsername;
+	}
+
+	public char[] getAuthPassword() {
+		return authPassword;
 	}
 }

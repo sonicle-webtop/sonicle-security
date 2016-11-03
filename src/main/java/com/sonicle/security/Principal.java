@@ -8,6 +8,7 @@
  */
 package com.sonicle.security;
 
+import com.sonicle.security.auth.AuthenticationDomain2;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
@@ -23,18 +24,50 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *
  */
 public class Principal implements java.security.Principal, Serializable {
-
-	private String domainId = null;
-	private String userId = null;
+	private AuthenticationDomain2 authenticationDomain = null;
 	private String name = null;
 	private String hashedName = null;
+	private String domainId = null;
+	private String userId = null;
+	private char[] password = null;
+	private String displayName = null;
+	
+	public Principal(AuthenticationDomain2 ad, String domainId, String userId, char[] password) {
+		this.authenticationDomain = ad;
+		this.name = DomainAccount.buildName(domainId, userId);
+		this.hashedName = Principal.buildHashedName(this.name);
+		this.domainId = domainId;
+		this.userId = userId;
+		this.password = password;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	private String description = null;
-	private String password = null;
+	
 	private String credential = null;
 	private CredentialAlgorithm algorithm = null;
 	private AuthenticationDomain ad;
 	
 	private ArrayList<GroupPrincipal> groups=new ArrayList<>();
+	
+	
+	
+	
+	
+	 
+	
+	
+	
+	
+	
+	
+	
 	
 	public Principal(String domainId, String userId) {
 		this.domainId = domainId;
@@ -74,6 +107,16 @@ public class Principal implements java.security.Principal, Serializable {
 	}
 	
 	/**
+	 * Gets the identifier that uniquely identify a user.
+	 * This is a composite field: userId@domainId.
+	 * @return The unique identifier.
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	/**
 	 * Gets the user ID.
 	 * Remember that in WebTop platform a user is uniquely recognized using
 	 * the composite identifier userId@domainId.
@@ -103,15 +146,33 @@ public class Principal implements java.security.Principal, Serializable {
 	}
 	
 	/**
-	 * Gets the identifier that uniquely identify a user.
-	 * This is a composite field: userId@domainId.
-	 * @return The unique identifier.
+	 * Gets the associated display name.
+	 * @return The display name.
 	 */
-	@Override
-	public String getName() {
-		return name;
+	public String getDisplayName() {
+		return displayName;
 	}
-
+	
+	public char[] getPassword() {
+		return password;
+	}
+	
+	/**
+	 * Sets the associated display name.
+	 * @param displayName The value of the name.
+	 */
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public String getDescription() {
 		return description;
 	}
@@ -121,11 +182,7 @@ public class Principal implements java.security.Principal, Serializable {
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getPassword() {
-		return password;
+		this.password = password.toCharArray();
 	}
 
 	public void setCredential(String credential) {

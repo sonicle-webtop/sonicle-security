@@ -31,26 +31,27 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth.directory;
+
+import java.util.HashMap;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public final class DirectoryOptions {
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
+	private final HashMap<String, Object> options = new HashMap<>();
+	
+	void setOption(String name, Object value) {
+		options.put(name, value);
 	}
 	
-	public String getKey() {
-		return this.key;
+	Object getOption(String name) {
+		return options.get(name);
 	}
 	
-	public int getVerificationCode() {
-		return this.verificationCode;
+	boolean hasOption(String name) {
+		return options.containsKey(name);
 	}
 }

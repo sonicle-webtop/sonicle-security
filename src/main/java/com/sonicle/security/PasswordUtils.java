@@ -33,111 +33,75 @@
  */
 package com.sonicle.security;
 
-import com.novell.ldap.util.Base64;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *
  * @author malbinola
  */
-public enum CredentialAlgorithm {
-	PLAIN("PLAIN"),
-    SHA("SHA"),
-    DES("DES");
+public class PasswordUtils {
 	
-	private final static Logger logger = (Logger)LoggerFactory.getLogger(CredentialAlgorithm.class);
-	private final String name;
-	
-	CredentialAlgorithm(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return name;
+	public static String encryptSHA(String string) {
+		return new String(new Base64().encode(DigestUtils.sha1(string)));
 	}
 	
-	public static boolean compare(CredentialAlgorithm algorithm, String string, String encryptedString) {
-		if(algorithm.equals(PLAIN)) {
-			return StringUtils.equals(string, encryptedString);
-		} else if(algorithm.equals(SHA)) {
-			return StringUtils.equals(encryptDigestBASE64(string, "SHA"), encryptedString);
-		} else if(algorithm.equals(DES)) {
-			return StringUtils.equals(PasswordUtils.encryptDES(string, string), encryptedString);
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * Method ported from Credential.java class with no modifications (except  
-	 * for the exception handling) in order to not break down encryption.
-	 * @param s
-	 * @param algorithm
-	 * @return 
-	 */
-	private static String encryptDigestBASE64(String s, String algorithm) {
-		try {
-			MessageDigest md = MessageDigest.getInstance(algorithm);
-			md.update(s.getBytes("UTF-8"));
-			return Base64.encode(md.digest());
-		} catch(Exception ex) {
-			logger.error("Crypto error", ex);
-			return null;
-		}
-	}
-
-	/**
-	 * Method ported from Credential.java class with no modifications (except  
-	 * for the exception handling) in order to not break down encryption.
-	 * @param cpass
-	 * @param key
-	 * @return 
-	 */
 	/*
-	private static String decipherDES(String cpass, String key) {
+	public static String encryptSHA(String string) {
 		try {
-			DESKeySpec ks = new DESKeySpec(key.getBytes("UTF-8"));
-			SecretKey sk = SecretKeyFactory.getInstance("DES").generateSecret(ks);
-			Cipher cipher = Cipher.getInstance("DES");
-			cipher.init(Cipher.DECRYPT_MODE, sk);
-			byte[] dec = Base64.decode(cpass);
-			byte[] utf8 = cipher.doFinal(dec);
-			return new String(utf8, "UTF-8");
+			MessageDigest md = MessageDigest.getInstance("SHA");
+			md.update(string.getBytes("UTF-8"));
+			return new String(new Base64().encode(md.digest()));
 			
-		} catch(Exception ex) {
-			logger.error("Crypto error", ex);
+		} catch(UnsupportedEncodingException | NoSuchAlgorithmException ex) {
+			//logger.error("Unable to encrypt", ex);
 			return null;
 		}
 	}
 	*/
 	
-	/**
-	 * Method ported from Credential.java class with no modifications (except  
-	 * for the exception handling) in order to not break down encryption.
-	 * @param pass
-	 * @param key
-	 * @return 
-	 */
-	/*
-	private static String cipherDES(String pass, String key) {
+	public static String encryptDES(String string, String key) {
 		try {
 			DESKeySpec ks = new DESKeySpec(key.getBytes("UTF-8"));
 			SecretKey sk = SecretKeyFactory.getInstance("DES").generateSecret(ks);
 			Cipher cipher = Cipher.getInstance("DES");
 			cipher.init(Cipher.ENCRYPT_MODE, sk);
-			return Base64.encode(cipher.doFinal(pass.getBytes("UTF-8")));
-		} catch(Exception ex) {
-			logger.error("Crypto error", ex);
+			return new String(new Base64().encode(cipher.doFinal(string.getBytes("UTF-8"))));
+			
+		} catch(UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException 
+				| InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
+			//logger.error("Unable to encrypt", ex);
 			return null;
 		}
 	}
-	*/
+	
+	public static String decryptDES(String encString, String key) {
+		try {
+			DESKeySpec ks = new DESKeySpec(key.getBytes("UTF-8"));
+			SecretKey sk = SecretKeyFactory.getInstance("DES").generateSecret(ks);
+			Cipher cipher = Cipher.getInstance("DES");
+			cipher.init(Cipher.DECRYPT_MODE, sk);
+			byte[] dec = new Base64().decode(encString);
+			byte[] utf8 = cipher.doFinal(dec);
+			return new String(utf8, "UTF-8");
+			
+		} catch(UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException 
+				| InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
+			//logger.error("Unable to decrypt", ex);
+			return null;
+		}
+	}
 }

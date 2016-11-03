@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authDirectories>
+	<authDirectory scheme="ldap" class-name="com.sonicle.security.auth.directory.LdapDirectory" />
+</authDirectories>

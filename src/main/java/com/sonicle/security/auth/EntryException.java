@@ -31,26 +31,29 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.otp;
+package com.sonicle.security.auth;
+
+import java.text.MessageFormat;
 
 /**
  *
  * @author malbinola
  */
-public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+public class EntryException extends DirectoryException{
 	
-	public OTPKey(String secretKey, int code) {
-		this.key = secretKey;
-		this.verificationCode = code;
+	public EntryException() {
+		super();
 	}
 	
-	public String getKey() {
-		return this.key;
+	public EntryException(Throwable cause) {
+		super(cause);
 	}
 	
-	public int getVerificationCode() {
-		return this.verificationCode;
+	public EntryException(String message, Object... arguments) {
+		super(MessageFormat.format(message, arguments));
+	}
+	
+	public EntryException(Throwable cause, String message, Object... arguments) {
+		super(MessageFormat.format(message, arguments), cause);
 	}
 }

@@ -65,7 +65,7 @@ public class LdapAuthenticatorCopy extends Authenticator {
         boolean ret=false;
 
         try {
-            String password=principal.getPassword();
+            String password=new String(principal.getPassword());
             String username=principal.getSubjectId();
             AuthenticationDomain ad=getAuthenticationDomain();
             String dc2=null;

@@ -32,7 +32,7 @@ public class VfsAuthenticator extends Authenticator {
 
     public boolean authenticate(Principal principal) throws LoginException {
         String fullname=principal.getName();
-        String password=principal.getPassword();
+        String password=new String(principal.getPassword());
         String username=principal.getSubjectId();
         int ix=uri.indexOf("://")+3;
         String eusername=URLEncoder.encode(username);
