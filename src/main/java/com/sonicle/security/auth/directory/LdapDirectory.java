@@ -103,7 +103,7 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public Principal authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -114,9 +114,7 @@ public class LdapDirectory extends AbstractDirectory {
 			AuthenticationResponse authResp = ldapAuthenticate(conFactory, baseDn, principal.getUserId(), principal.getPassword(), attrs);
 			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
 			
-			UserEntry userEntry = createUserEntry(authResp.getLdapEntry());
-			principal.setDisplayName(userEntry.displayName);
-			return principal;
+			return createUserEntry(authResp.getLdapEntry());
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);

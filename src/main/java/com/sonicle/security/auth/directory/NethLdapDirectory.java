@@ -63,7 +63,7 @@ public class NethLdapDirectory extends LdapDirectory {
 	}
 	
 	@Override
-	public Principal authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -79,16 +79,9 @@ public class NethLdapDirectory extends LdapDirectory {
 			if(entries.size() != 1) throw new DirectoryException("Returned entries count must be 1");
 			
 			for(LdapEntry entry : entries) {
-				UserEntry userEntry = createUserEntry(entry);
-				principal.setDisplayName(userEntry.displayName);
-				break;
-				/*
-				LdapAttribute attr = entry.getAttribute("cn");
-				if(attr != null) principal.setDisplayName(attr.getStringValue());
-				break;
-				*/
+				return createUserEntry(entry);
 			}
-			return principal;
+			return null; // This is not possible! :)
 			
 		} catch(LdapException ex) {
 			throw new DirectoryException(ex);

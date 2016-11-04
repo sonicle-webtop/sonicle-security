@@ -48,7 +48,7 @@ public interface Directory {
 	public abstract String sanitizeUsername(DirectoryOptions opts, String username);
 	public abstract boolean validateUsername(DirectoryOptions opts, String username);
 	public abstract boolean validatePasswordPolicy(DirectoryOptions opts, char[] password);
-	public abstract Principal authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
+	public abstract UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
 	public abstract List<UserEntry> listUsers(DirectoryOptions opts) throws DirectoryException;
 	public abstract void addUser(DirectoryOptions opts, UserEntry entry) throws EntryException, DirectoryException;
 	public abstract void updateUser(DirectoryOptions opts, UserEntry entry) throws DirectoryException;
