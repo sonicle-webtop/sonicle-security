@@ -35,7 +35,10 @@ package com.sonicle.security.auth.directory;
 
 import com.sonicle.security.Principal;
 import com.sonicle.security.auth.DirectoryException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.LdapAttribute;
@@ -52,14 +55,20 @@ import org.slf4j.LoggerFactory;
 public class NethLdapDirectory extends LdapDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(NethLdapDirectory.class);
 	
+	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
+		EnumSet.of(
+			DirectoryCapability.USERS_READ
+		)
+	);
+	
 	@Override
 	public NethLdapConfigBuilder getConfigBuilder() {
 		return NethLdapConfigBuilder.getInstance();
 	}
-
+	
 	@Override
-	public boolean isReadOnly() {
-		return true;
+	public Collection<DirectoryCapability> getCapabilities() {
+		return CAPABILITIES;
 	}
 	
 	@Override

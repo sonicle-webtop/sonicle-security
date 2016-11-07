@@ -40,6 +40,8 @@ import com.sonicle.security.auth.EntryException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -80,10 +82,23 @@ import org.slf4j.LoggerFactory;
 public class LdapDirectory extends AbstractDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapDirectory.class);
 	public static final Pattern PATTERN_USERNAME = Pattern.compile("^" + RegexUtils.MATCH_USERNAME + "$");
+	
+	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
+		EnumSet.of(
+			DirectoryCapability.PASSWORD_WRITE,
+			DirectoryCapability.USERS_READ,
+			DirectoryCapability.USERS_WRITE
+		)
+	);
 
 	@Override
 	public LdapConfigBuilder getConfigBuilder() {
 		return LdapConfigBuilder.getInstance();
+	}
+	
+	@Override
+	public Collection<DirectoryCapability> getCapabilities() {
+		return CAPABILITIES;
 	}
 	
 	@Override
@@ -123,11 +138,12 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public List<UserEntry> listUsers(DirectoryOptions opts) throws DirectoryException {
+	public List<UserEntry> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		ArrayList<UserEntry> entries = new ArrayList<>();
 		
 		try {
+			ensureCapability(DirectoryCapability.USERS_READ);
 			final String[] attrs = new String[]{"uid", "givenName", "sn", "cn", "mail"};
 			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
 			
@@ -146,10 +162,11 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void addUser(DirectoryOptions opts, UserEntry entry) throws EntryException, DirectoryException {
+	public void addUser(DirectoryOptions opts, String domainId, UserEntry entry) throws EntryException, DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
+			ensureCapability(DirectoryCapability.USERS_WRITE);
 			if(StringUtils.isBlank(entry.userId)) throw new DirectoryException("Missing value for 'userId'");
 			if(StringUtils.isBlank(entry.firstName)) throw new DirectoryException("Missing value for 'firstName'");
 			if(StringUtils.isBlank(entry.lastName)) throw new DirectoryException("Missing value for 'lastName'");
@@ -172,10 +189,11 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUser(DirectoryOptions opts, UserEntry entry) throws DirectoryException {
+	public void updateUser(DirectoryOptions opts, String domainId, UserEntry entry) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
+			ensureCapability(DirectoryCapability.USERS_WRITE);
 			if(StringUtils.isBlank(entry.userId)) throw new DirectoryException("Missing value for 'userId'");
 			if(StringUtils.isBlank(entry.firstName)) throw new DirectoryException("Missing value for 'firstName'");
 			if(StringUtils.isBlank(entry.lastName)) throw new DirectoryException("Missing value for 'lastName'");
@@ -194,10 +212,11 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void deleteUser(DirectoryOptions opts, String userId) throws DirectoryException {
+	public void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
+			ensureCapability(DirectoryCapability.USERS_WRITE);
 			String uid = sanitizeUsername(opts, userId);
 			
 			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
@@ -211,10 +230,11 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUserPassword(DirectoryOptions opts, String userId, char[] newPassword) throws DirectoryException {
+	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
+			ensureCapability(DirectoryCapability.PASSWORD_WRITE);
 			String uid = sanitizeUsername(opts, userId);
 			
 			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
@@ -228,12 +248,12 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUserPassword(DirectoryOptions opts, String userId, char[] oldPassword, char[] newPassword) throws DirectoryException {
+	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws DirectoryException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public List<String> listGroups(DirectoryOptions dopts) throws DirectoryException {
+	public List<String> listGroups(DirectoryOptions dopts, String domainId) throws DirectoryException {
 		throw new UnsupportedOperationException("Not supported on this directory");
 	}
 	

@@ -64,6 +64,18 @@ public enum CredentialAlgorithm {
 		return name;
 	}
 	
+	public static String encrypt(CredentialAlgorithm algorithm, String string) {
+		if(algorithm.equals(PLAIN)) {
+			return string;
+		} else if(algorithm.equals(SHA)) {
+			return encryptDigestBASE64(string, "SHA");
+		} else if(algorithm.equals(DES)) {
+			return PasswordUtils.encryptDES(string, string);
+		} else {
+			return null;
+		}
+	}
+	
 	public static boolean compare(CredentialAlgorithm algorithm, String string, String encryptedString) {
 		if(algorithm.equals(PLAIN)) {
 			return StringUtils.equals(string, encryptedString);

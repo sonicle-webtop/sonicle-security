@@ -37,6 +37,7 @@ import com.sonicle.security.Principal;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
 import com.sonicle.security.auth.directory.AbstractDirectory.UserEntry;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,15 +46,16 @@ import java.util.List;
  */
 public interface Directory {
 	
+	Collection<DirectoryCapability> getCapabilities();
 	public abstract String sanitizeUsername(DirectoryOptions opts, String username);
 	public abstract boolean validateUsername(DirectoryOptions opts, String username);
 	public abstract boolean validatePasswordPolicy(DirectoryOptions opts, char[] password);
 	public abstract UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
-	public abstract List<UserEntry> listUsers(DirectoryOptions opts) throws DirectoryException;
-	public abstract void addUser(DirectoryOptions opts, UserEntry entry) throws EntryException, DirectoryException;
-	public abstract void updateUser(DirectoryOptions opts, UserEntry entry) throws DirectoryException;
-	public abstract void updateUserPassword(DirectoryOptions opts, String userId, char[] newPassword) throws DirectoryException;
-	public abstract void updateUserPassword(DirectoryOptions opts, String userId, char[] oldPassword, char[] newPassword) throws DirectoryException;
-	public abstract void deleteUser(DirectoryOptions opts, String userId) throws DirectoryException;
-	public abstract List<String> listGroups(DirectoryOptions opts) throws DirectoryException;
+	public abstract List<UserEntry> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException;
+	public abstract void addUser(DirectoryOptions opts, String domainId, UserEntry entry) throws EntryException, DirectoryException;
+	public abstract void updateUser(DirectoryOptions opts, String domainId, UserEntry entry) throws DirectoryException;
+	public abstract void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException;
+	public abstract void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws EntryException, DirectoryException;
+	public abstract void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException;
+	public abstract List<String> listGroups(DirectoryOptions opts, String domainId) throws DirectoryException;
 }

@@ -33,41 +33,12 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.auth.DirectoryException;
-
 /**
  *
  * @author malbinola
  */
-public abstract class AbstractDirectory implements Directory {
-	
-	public AbstractConfigBuilder getConfigBuilder() {
-		return null;
-	}
-	
-	public boolean hasCapability(final DirectoryCapability capability) {
-		return getCapabilities().contains(capability);
-	}
-	
-	public void ensureCapability(final DirectoryCapability capability) throws DirectoryException {
-		if(!hasCapability(capability)) throw new DirectoryException("Capability not supported");
-	}
-	
-	public static class UserEntry {
-		public String userId = null;
-		public String firstName = null;
-		public String lastName = null;
-		public String displayName = null;
-		public String email = null;
-		
-		public UserEntry() {}
-		
-		public UserEntry(String userId, String firstName, String lastName, String displayName, String email) {
-			this.userId = userId;
-			this.firstName = firstName;
-			this.lastName = lastName;
-			this.displayName = displayName;
-			this.email = email;
-		}
-	}
+public enum DirectoryCapability {
+	PASSWORD_WRITE,
+	USERS_READ,
+	USERS_WRITE
 }
