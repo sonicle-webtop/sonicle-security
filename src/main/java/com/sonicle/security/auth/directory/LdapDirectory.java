@@ -37,6 +37,8 @@ import com.sonicle.commons.RegexUtils;
 import com.sonicle.security.Principal;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,6 +83,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LdapDirectory extends AbstractDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapDirectory.class);
+	public static final String SCHEME = "ldap";
 	public static final Pattern PATTERN_USERNAME = Pattern.compile("^" + RegexUtils.MATCH_USERNAME + "$");
 	
 	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
@@ -90,6 +93,10 @@ public class LdapDirectory extends AbstractDirectory {
 			DirectoryCapability.USERS_WRITE
 		)
 	);
+	
+	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+		return new URI(SCHEME, null, host, (port == null) ? -1 : port, path, null, null);
+	}
 
 	@Override
 	public LdapConfigBuilder getConfigBuilder() {

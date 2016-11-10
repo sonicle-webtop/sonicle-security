@@ -35,7 +35,8 @@ package com.sonicle.security.auth.directory;
 
 import com.sonicle.security.Principal;
 import com.sonicle.security.auth.DirectoryException;
-import java.util.Arrays;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -52,8 +53,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author malbinola
  */
-public class NethLdapDirectory extends LdapDirectory {
-	private final static Logger logger = (Logger)LoggerFactory.getLogger(NethLdapDirectory.class);
+public class LdapNethDirectory extends LdapDirectory {
+	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapNethDirectory.class);
+	public static final String SCHEME = "ldapneth";
 	
 	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
 		EnumSet.of(
@@ -61,9 +63,14 @@ public class NethLdapDirectory extends LdapDirectory {
 		)
 	);
 	
+	public URI buildUri(String host, Integer port) throws URISyntaxException {
+		int iport = (port == null) ? LdapNethConfigBuilder.DEFAULT_PORT : port;
+		return new URI(SCHEME, null, null, iport, LdapNethConfigBuilder.DEFAULT_USERS_DN, null, null);
+	}
+	
 	@Override
-	public NethLdapConfigBuilder getConfigBuilder() {
-		return NethLdapConfigBuilder.getInstance();
+	public LdapNethConfigBuilder getConfigBuilder() {
+		return LdapNethConfigBuilder.getInstance();
 	}
 	
 	@Override

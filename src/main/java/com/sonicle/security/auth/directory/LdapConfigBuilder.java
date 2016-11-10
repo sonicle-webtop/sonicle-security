@@ -41,21 +41,21 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class LdapConfigBuilder extends AbstractConfigBuilder {
 	private static final LdapConfigBuilder BUILDER = new LdapConfigBuilder();
-	private static final String HOST = "host";
-	private static final String PORT = "port";
-	private static final String USE_SSL = "useSSL";
-	private static final String USE_START_TLS = "useStartTLS";
-	private static final String BASE_DN = "baseDn";
-	private static final String USERS_DN = "";
-	private static final String ADMIN_USERNAME = "adminUsername";
-	private static final String ADMIN_PASSWORD = "adminPassword";
+	protected static final String HOST = "host";
+	protected static final String PORT = "port";
+	protected static final String USE_SSL = "useSSL";
+	protected static final String USE_START_TLS = "useStartTLS";
+	protected static final String BASE_DN = "baseDn";
+	protected static final String USERS_DN = "";
+	protected static final String ADMIN_USERNAME = "adminUsername";
+	protected static final String ADMIN_PASSWORD = "adminPassword";
 	
 	public static LdapConfigBuilder getInstance() {
 		return BUILDER;
 	}
 	
 	public String getHost(DirectoryOptions opts) {
-		return getString(opts, HOST, "localhost");
+		return getString(opts, HOST, null);
 	}
 	
 	public void setHost(DirectoryOptions opts, String host) {
@@ -63,7 +63,7 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 	}
 	
 	public int getPort(DirectoryOptions opts) {
-		return getInteger(opts, PORT, 389);
+		return getInteger(opts, PORT, -1);
 	}
 	
 	public void setPort(DirectoryOptions opts, int port) {
@@ -95,7 +95,7 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 	}
 	
 	public String getUsersDn(DirectoryOptions opts) {
-		return getString(opts, USERS_DN, "ou=people");
+		return getString(opts, USERS_DN, null);
 	}
 	
 	public void setUsersDn(DirectoryOptions opts, String usersDn) {
@@ -103,7 +103,7 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 	}
 	
 	public String getAdminUsername(DirectoryOptions opts) {
-		return getString(opts, ADMIN_USERNAME, "localhost");
+		return getString(opts, ADMIN_USERNAME, null);
 	}
 	
 	public void setAdminUsername(DirectoryOptions opts, String adminUsername) {
