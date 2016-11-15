@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authDirectories>
 	<authDirectory scheme="ldap" class-name="com.sonicle.security.auth.directory.LdapDirectory" />
+	<authDirectory scheme="ldapneth" class-name="com.sonicle.security.auth.directory.LdapNethDirectory" />
+	<authDirectory scheme="imap" class-name="com.sonicle.security.auth.directory.ImapDirectory" />
+	<authDirectory scheme="smb" class-name="com.sonicle.security.auth.directory.SmbDirectory" />
+	<authDirectory scheme="sftp" class-name="com.sonicle.security.auth.directory.SftpDirectory" />
 </authDirectories>

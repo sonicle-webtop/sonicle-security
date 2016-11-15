@@ -37,6 +37,8 @@ import com.sonicle.security.Principal;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
 import com.sonicle.security.auth.directory.AbstractDirectory.UserEntry;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,6 +49,8 @@ import java.util.List;
 public interface Directory {
 	
 	Collection<DirectoryCapability> getCapabilities();
+	public abstract <T extends AbstractConfigBuilder> T getConfigBuilder();
+	public abstract URI buildUri(String host, Integer port, String path) throws URISyntaxException;
 	public abstract String sanitizeUsername(DirectoryOptions opts, String username);
 	public abstract boolean validateUsername(DirectoryOptions opts, String username);
 	public abstract boolean validatePasswordPolicy(DirectoryOptions opts, char[] password);

@@ -33,14 +33,15 @@
  */
 package com.sonicle.security.auth.directory;
 
+import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.RegexUtils;
 import com.sonicle.security.Principal;
+import com.sonicle.security.ConnectionSecurity;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -93,10 +94,6 @@ public class LdapDirectory extends AbstractDirectory {
 			DirectoryCapability.USERS_WRITE
 		)
 	);
-	
-	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
-		return new URI(SCHEME, null, host, (port == null) ? -1 : port, path, null, null);
-	}
 
 	@Override
 	public LdapConfigBuilder getConfigBuilder() {
@@ -106,6 +103,12 @@ public class LdapDirectory extends AbstractDirectory {
 	@Override
 	public Collection<DirectoryCapability> getCapabilities() {
 		return CAPABILITIES;
+	}
+	
+	@Override
+	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+		int iport = (port == null) ? LdapConfigBuilder.DEFAULT_PORT : port;
+		return new URI(SCHEME, null, host, iport, path, null, null);
 	}
 	
 	@Override
@@ -386,13 +389,18 @@ public class LdapDirectory extends AbstractDirectory {
 			adminDn = "cn=" + builder.getAdminUsername(opts) + "," + builder.getBaseDn(opts);
 		}
 		char[] adminPassword = useAdminCredentials ? builder.getAdminPassword(opts) : null;
-		return createConnectionConfig(builder.getHost(opts), builder.getPort(opts), builder.getUseSSL(opts), builder.getUseStartTLS(opts), adminDn, adminPassword);
+		return createConnectionConfig(builder.getHost(opts), builder.getPort(opts), builder.getConnectionSecurity(opts), adminDn, adminPassword);
 	}
 	
-	protected ConnectionConfig createConnectionConfig(String host, int port, boolean useSSL, boolean useStartTLS, String adminDn, char[] adminPassword) {
+	protected ConnectionConfig createConnectionConfig(String host, int port, ConnectionSecurity security, String adminDn, char[] adminPassword) {
 		ConnectionConfig config = new ConnectionConfig("ldap://" + host + ":" + port);
-		if(useSSL) config.setUseSSL(true);
-		if(useStartTLS) config.setUseStartTLS(true);
+		
+		if (EnumUtils.equals(security, ConnectionSecurity.SSL)) {
+			config.setLdapUrl("ldaps://" + host + ":" + port);
+			config.setUseSSL(true);
+		} else if (EnumUtils.equals(security, ConnectionSecurity.STARTTLS)) {
+			config.setUseStartTLS(true);
+		}
 		if(!StringUtils.isBlank(adminDn) && (adminPassword != null)) {
 			config.setConnectionInitializer(new BindConnectionInitializer(adminDn, new Credential(adminPassword)));
 		}

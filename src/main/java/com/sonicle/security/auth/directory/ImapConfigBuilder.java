@@ -34,43 +34,35 @@
 package com.sonicle.security.auth.directory;
 
 import com.sonicle.security.ConnectionSecurity;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author malbinola
  */
-public class LdapConfigBuilder extends AbstractConfigBuilder {
-	private static final LdapConfigBuilder BUILDER = new LdapConfigBuilder();
+public class ImapConfigBuilder extends AbstractConfigBuilder {
+	private static final ImapConfigBuilder BUILDER = new ImapConfigBuilder();
 	protected static final String PARAM_HOST = "host";
 	protected static final String PARAM_PORT = "port";
 	protected static final String PARAM_CON_SECURITY = "conSecurity";
-	protected static final String PARAM_BASE_DN = "baseDn";
-	protected static final String PARAM_USERS_DN = "usersDn";
-	protected static final String PARAM_ADMIN_USERNAME = "adminUsername";
-	protected static final String PARAM_ADMIN_PASSWORD = "adminPassword";
 	
-	public static final String DEFAULT_HOST = "localhost";
-	public static final Integer DEFAULT_PORT = 389;
-	
-	public static LdapConfigBuilder getInstance() {
+	public static ImapConfigBuilder getInstance() {
 		return BUILDER;
 	}
 	
 	public String getHost(DirectoryOptions opts) {
-		return getString(opts, PARAM_HOST, DEFAULT_HOST);
+		return getString(opts, PARAM_HOST, null);
 	}
 	
 	public void setHost(DirectoryOptions opts, String host) {
 		setParam(opts, PARAM_HOST, host);
 	}
 	
-	public int getPort(DirectoryOptions opts) {
-		return getInteger(opts, PARAM_PORT, DEFAULT_PORT);
+	public Integer getPort(DirectoryOptions opts) {
+		return getInteger(opts, PARAM_PORT, null);
 	}
 	
 	public void setPort(DirectoryOptions opts, int port) {
-		if (port > -1) setParam(opts, PARAM_PORT, port);
+		if(port > -1) setParam(opts, PARAM_PORT, port);
 	}
 	
 	public ConnectionSecurity getConnectionSecurity(DirectoryOptions opts) {
@@ -79,46 +71,5 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 	
 	public void setConnectionSecurity(DirectoryOptions opts, ConnectionSecurity conSecurity) {
 		setParam(opts, PARAM_CON_SECURITY, conSecurity);
-	}
-	
-	public String getBaseDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_BASE_DN, null);
-	}
-	
-	public void setBaseDn(DirectoryOptions opts, String baseDn) {
-		setParam(opts, PARAM_BASE_DN, baseDn);
-	}
-	
-	public String getUsersDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_USERS_DN, null);
-	}
-	
-	public void setUsersDn(DirectoryOptions opts, String usersDn) {
-		setParam(opts, PARAM_USERS_DN, usersDn);
-	}
-	
-	public String getAdminUsername(DirectoryOptions opts) {
-		return getString(opts, PARAM_ADMIN_USERNAME, null);
-	}
-	
-	public void setAdminUsername(DirectoryOptions opts, String adminUsername) {
-		setParam(opts, PARAM_ADMIN_USERNAME, adminUsername);
-	}
-	
-	public char[] getAdminPassword(DirectoryOptions opts) {
-		return (char[]) getParam(opts, PARAM_ADMIN_PASSWORD);
-	}
-	
-	public void setAdminPassword(DirectoryOptions opts, char[] adminPassword) {
-		setParam(opts, PARAM_ADMIN_PASSWORD, adminPassword);
-	}
-	
-	public static String toDn(String domainName) {
-		StringBuilder dn = new StringBuilder();
-		for (String token : StringUtils.split(domainName, ".")) {
-			dn.append(",dc=");
-			dn.append(token);
-		}
-		return StringUtils.substring(dn.toString(), 1);
 	}
 }

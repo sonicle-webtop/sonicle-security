@@ -39,8 +39,6 @@ package com.sonicle.security.auth.directory;
  */
 public class LdapNethConfigBuilder extends LdapConfigBuilder {
 	private static final LdapNethConfigBuilder BUILDER = new LdapNethConfigBuilder();
-	public static final String DEFAULT_HOST = "localhost";
-	public static final Integer DEFAULT_PORT = 389;
 	public static final String DEFAULT_USERS_DN = "ou=people";
 	
 	public static LdapNethConfigBuilder getInstance() {
@@ -49,16 +47,16 @@ public class LdapNethConfigBuilder extends LdapConfigBuilder {
 	
 	@Override
 	public String getHost(DirectoryOptions opts) {
-		return getString(opts, HOST, DEFAULT_HOST);
+		return getString(opts, PARAM_HOST, DEFAULT_HOST);
 	}
 	
 	@Override
 	public int getPort(DirectoryOptions opts) {
-		return getInteger(opts, PORT, DEFAULT_PORT);
+		return getInteger(opts, PARAM_PORT, DEFAULT_PORT);
 	}
 	
 	@Override
 	public String getUsersDn(DirectoryOptions opts) {
-		return getString(opts, USERS_DN, DEFAULT_USERS_DN);
+		return getString(opts, PARAM_USERS_DN, DEFAULT_USERS_DN);
 	}
 }

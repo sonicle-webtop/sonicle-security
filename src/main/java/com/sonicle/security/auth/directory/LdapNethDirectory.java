@@ -63,11 +63,6 @@ public class LdapNethDirectory extends LdapDirectory {
 		)
 	);
 	
-	public URI buildUri(String host, Integer port) throws URISyntaxException {
-		int iport = (port == null) ? LdapNethConfigBuilder.DEFAULT_PORT : port;
-		return new URI(SCHEME, null, null, iport, LdapNethConfigBuilder.DEFAULT_USERS_DN, null, null);
-	}
-	
 	@Override
 	public LdapNethConfigBuilder getConfigBuilder() {
 		return LdapNethConfigBuilder.getInstance();
@@ -76,6 +71,13 @@ public class LdapNethDirectory extends LdapDirectory {
 	@Override
 	public Collection<DirectoryCapability> getCapabilities() {
 		return CAPABILITIES;
+	}
+	
+	@Override
+	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+		// path can be ignored!
+		int iport = (port == null) ? LdapNethConfigBuilder.DEFAULT_PORT : port;
+		return new URI(SCHEME, null, host, iport, "/" + LdapNethConfigBuilder.DEFAULT_USERS_DN, null, null);
 	}
 	
 	@Override

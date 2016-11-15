@@ -56,6 +56,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class PasswordUtils {
 	
 	public static String encryptSHA(String string) {
+		if(string == null) return null;
 		return new String(new Base64().encode(DigestUtils.sha1(string)));
 	}
 	
@@ -81,7 +82,7 @@ public class PasswordUtils {
 			cipher.init(Cipher.ENCRYPT_MODE, sk);
 			return new String(new Base64().encode(cipher.doFinal(string.getBytes("UTF-8"))));
 			
-		} catch(UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException 
+		} catch(IllegalArgumentException | UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException 
 				| InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
 			//logger.error("Unable to encrypt", ex);
 			return null;
@@ -98,7 +99,7 @@ public class PasswordUtils {
 			byte[] utf8 = cipher.doFinal(dec);
 			return new String(utf8, "UTF-8");
 			
-		} catch(UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException 
+		} catch(IllegalArgumentException | UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException 
 				| InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
 			//logger.error("Unable to decrypt", ex);
 			return null;

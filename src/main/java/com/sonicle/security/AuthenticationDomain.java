@@ -33,7 +33,6 @@
  */
 package com.sonicle.security;
 
-import com.sonicle.webtop.core.bol.ODomain;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -47,21 +46,15 @@ public class AuthenticationDomain {
 	private URI authUri;
 	private String authUsername;
 	private char[] authPassword;
+	private ConnectionSecurity authConSecurity;
 	
-	public AuthenticationDomain(String domainId, String internetDomain, String authUri, String authUsername, char[] authPassword) throws URISyntaxException {
+	public AuthenticationDomain(String domainId, String internetDomain, String authUri, String authUsername, char[] authPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
 		this.domainId = domainId;
 		this.internetDomain = internetDomain;
 		this.authUri = new URI(authUri);
 		this.authUsername = authUsername;
 		this.authPassword = authPassword;
-	}
-	
-	public AuthenticationDomain(ODomain domain) throws URISyntaxException {
-		this.domainId = domain.getDomainId();
-		this.internetDomain = domain.getDomainName();
-		this.authUri = new URI(domain.getAuthUri());
-		this.authUsername = domain.getAuthUsername();
-		if(domain.getAuthPassword() != null) this.authPassword = domain.getAuthPassword().toCharArray();
+		this.authConSecurity = authConSecurity;
 	}
 
 	public String getDomainId() {
@@ -82,5 +75,9 @@ public class AuthenticationDomain {
 
 	public char[] getAuthPassword() {
 		return authPassword;
+	}
+	
+	public ConnectionSecurity getAuthConnectionSecurity() {
+		return authConSecurity;
 	}
 }

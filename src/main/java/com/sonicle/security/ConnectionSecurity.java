@@ -1,5 +1,5 @@
 /*
- * sonicle-security is a helper library developed by Sonicle S.r.l.
+ * WebTop Services is a Web Application framework developed by Sonicle S.r.l.
  * Copyright (C) 2014 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -31,45 +31,12 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.security.auth.directory;
-
-import com.sonicle.security.auth.DirectoryException;
+package com.sonicle.security;
 
 /**
  *
  * @author malbinola
  */
-public abstract class AbstractDirectory implements Directory {
-	
-	/*
-	public AbstractConfigBuilder getConfigBuilder() {
-		return null;
-	}
-	*/
-	
-	public boolean hasCapability(final DirectoryCapability capability) {
-		return getCapabilities().contains(capability);
-	}
-	
-	public void ensureCapability(final DirectoryCapability capability) throws DirectoryException {
-		if(!hasCapability(capability)) throw new DirectoryException("Capability not supported");
-	}
-	
-	public static class UserEntry {
-		public String userId = null;
-		public String firstName = null;
-		public String lastName = null;
-		public String displayName = null;
-		public String email = null;
-		
-		public UserEntry() {}
-		
-		public UserEntry(String userId, String firstName, String lastName, String displayName, String email) {
-			this.userId = userId;
-			this.firstName = firstName;
-			this.lastName = lastName;
-			this.displayName = displayName;
-			this.email = email;
-		}
-	}
+public enum ConnectionSecurity {
+	SSL, STARTTLS;
 }
