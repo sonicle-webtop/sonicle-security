@@ -211,7 +211,7 @@ public class AuthenticationDomain implements Serializable {
 			ODomain odomain=DomainDAO.getInstance().selectById(con,domainId);
             if (odomain!=null) {
                 String description=odomain.getDescription();
-                String domain=odomain.getDomainName();
+                String domain=odomain.getInternetName();
                 String authuri=odomain.getAuthUri();
                 String adminuser=odomain.getAuthUsername();
 				String adminpassword="";
@@ -223,9 +223,9 @@ public class AuthenticationDomain implements Serializable {
 				
                 int order=1;
                 boolean enabled=odomain.getEnabled();
-				Boolean casesensitive = odomain.getCaseSensitiveAuth();
+				Boolean casesensitive = odomain.getAuthCaseSensitive();
 				Boolean autocreation = odomain.getUserAutoCreation();
-				Boolean advsecurity = odomain.getWebtopAdvSecurity();
+				Boolean advsecurity = odomain.getAuthPasswordPolicy();
                 ad=new AuthenticationDomain(domainId, description, domain, authuri, adminuser, adminpassword, order, enabled, casesensitive, autocreation, advsecurity);
             }
         } catch(Exception exc) {

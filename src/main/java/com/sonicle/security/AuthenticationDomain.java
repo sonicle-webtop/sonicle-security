@@ -46,7 +46,7 @@ public class AuthenticationDomain {
 	private URI authUri;
 	private String authUsername;
 	private char[] authPassword;
-	private ConnectionSecurity authConSecurity;
+	private ConnectionSecurity authConnSecurity;
 	
 	public AuthenticationDomain(String domainId, String internetDomain, String authUri, String authUsername, char[] authPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
 		this.domainId = domainId;
@@ -54,7 +54,7 @@ public class AuthenticationDomain {
 		this.authUri = new URI(authUri);
 		this.authUsername = authUsername;
 		this.authPassword = authPassword;
-		this.authConSecurity = authConSecurity;
+		this.authConnSecurity = authConSecurity;
 	}
 
 	public String getDomainId() {
@@ -77,7 +77,7 @@ public class AuthenticationDomain {
 		return authPassword;
 	}
 	
-	public ConnectionSecurity getAuthConnectionSecurity() {
-		return authConSecurity;
+	public ConnectionSecurity getAuthConnSecurity() {
+		return authConnSecurity;
 	}
 }
