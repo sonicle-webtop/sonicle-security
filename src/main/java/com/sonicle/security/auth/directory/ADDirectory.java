@@ -85,22 +85,22 @@ public class ADDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
-	public List<UserEntry> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
-	public void addUser(DirectoryOptions opts, String domainId, UserEntry entry) throws EntryException, DirectoryException {
+	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, UserEntry entry) throws DirectoryException {
+	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 

@@ -96,7 +96,7 @@ public class SftpDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		FileObject fo = null;
 		
 		try {
@@ -108,7 +108,7 @@ public class SftpDirectory extends AbstractDirectory {
 			fo = fsm.resolveFile(uri);
 			if(!fo.exists()) throw new DirectoryException("Root file not accessible");
 			fsm.getFilesCache().clear(fo.getFileSystem());
-			return new UserEntry(principal.getUserId(), null, null, null, null);
+			return new AuthUser(principal.getUserId(), null, null, null, null);
 			
 		} catch(FileSystemException | URISyntaxException ex) {
 			logger.error("VfsError", ex);
@@ -119,17 +119,17 @@ public class SftpDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public List<UserEntry> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void addUser(DirectoryOptions opts, String domainId, UserEntry entry) throws EntryException, DirectoryException {
+	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, UserEntry entry) throws DirectoryException {
+	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 

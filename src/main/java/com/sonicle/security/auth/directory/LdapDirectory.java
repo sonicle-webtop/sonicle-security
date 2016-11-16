@@ -128,7 +128,7 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -148,9 +148,9 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public List<UserEntry> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
-		ArrayList<UserEntry> entries = new ArrayList<>();
+		ArrayList<AuthUser> entries = new ArrayList<>();
 		
 		try {
 			ensureCapability(DirectoryCapability.USERS_READ);
@@ -172,7 +172,7 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void addUser(DirectoryOptions opts, String domainId, UserEntry entry) throws EntryException, DirectoryException {
+	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -199,7 +199,7 @@ public class LdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, UserEntry entry) throws DirectoryException {
+	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -267,7 +267,7 @@ public class LdapDirectory extends AbstractDirectory {
 		throw new UnsupportedOperationException("Not supported on this directory");
 	}
 	
-	protected List<LdapAttribute> createLdapAddAttrs(UserEntry userEntry) throws DirectoryException {
+	protected List<LdapAttribute> createLdapAddAttrs(AuthUser userEntry) throws DirectoryException {
 		ArrayList<LdapAttribute> attrs = new ArrayList<>();
 		attrs.add(new LdapAttribute("uid", userEntry.userId));
 		attrs.add(new LdapAttribute("givenName", userEntry.firstName));
@@ -276,7 +276,7 @@ public class LdapDirectory extends AbstractDirectory {
 		return attrs;
 	}
 	
-	protected List<AttributeModification> createLdapUpdateMods(UserEntry userEntry) throws DirectoryException {
+	protected List<AttributeModification> createLdapUpdateMods(AuthUser userEntry) throws DirectoryException {
 		ArrayList<AttributeModification> mods = new ArrayList<>();
 		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute("givenName", userEntry.firstName)));
 		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute("sn", userEntry.lastName)));
@@ -284,8 +284,8 @@ public class LdapDirectory extends AbstractDirectory {
 		return mods;
 	}
 	
-	protected UserEntry createUserEntry(LdapEntry ldapEntry) {
-		UserEntry userEntry = new UserEntry();
+	protected AuthUser createUserEntry(LdapEntry ldapEntry) {
+		AuthUser userEntry = new AuthUser();
 		userEntry.userId = getEntryAttribute(ldapEntry, "uid");
 		userEntry.firstName = getEntryAttribute(ldapEntry, "givenName");
 		userEntry.lastName = getEntryAttribute(ldapEntry, "sn");

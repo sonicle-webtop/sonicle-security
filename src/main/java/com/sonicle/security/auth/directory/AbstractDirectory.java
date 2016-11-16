@@ -55,16 +55,16 @@ public abstract class AbstractDirectory implements Directory {
 		if(!hasCapability(capability)) throw new DirectoryException("Capability not supported");
 	}
 	
-	public static class UserEntry {
+	public static class AuthUser {
 		public String userId = null;
 		public String firstName = null;
 		public String lastName = null;
 		public String displayName = null;
 		public String email = null;
 		
-		public UserEntry() {}
+		public AuthUser() {}
 		
-		public UserEntry(String userId, String firstName, String lastName, String displayName, String email) {
+		public AuthUser(String userId, String firstName, String lastName, String displayName, String email) {
 			this.userId = userId;
 			this.firstName = firstName;
 			this.lastName = lastName;

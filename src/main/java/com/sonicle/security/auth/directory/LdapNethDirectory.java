@@ -81,7 +81,7 @@ public class LdapNethDirectory extends LdapDirectory {
 	}
 	
 	@Override
-	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -107,7 +107,7 @@ public class LdapNethDirectory extends LdapDirectory {
 	}
 	
 	@Override
-	protected List<LdapAttribute> createLdapAddAttrs(UserEntry userEntry) throws DirectoryException {
+	protected List<LdapAttribute> createLdapAddAttrs(AuthUser userEntry) throws DirectoryException {
 		List<LdapAttribute> attrs = super.createLdapAddAttrs(userEntry);
 		LdapAttribute objectClass = new LdapAttribute("objectClass");
 		objectClass.addStringValue("inetOrgPerson", "top");

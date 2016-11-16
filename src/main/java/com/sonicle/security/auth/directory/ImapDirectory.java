@@ -96,13 +96,13 @@ public class ImapDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public UserEntry authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		Store store = null;
 		
 		try {
 			store = createStore(opts);
 			store.connect(principal.getUserId(), new String(principal.getPassword()));
-			return new UserEntry(principal.getUserId(), null, null, null, null);
+			return new AuthUser(principal.getUserId(), null, null, null, null);
 			
 		} catch(MessagingException ex) {
 			logger.error("ImapError", ex);
@@ -113,17 +113,17 @@ public class ImapDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public List<UserEntry> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void addUser(DirectoryOptions opts, String domainId, UserEntry entry) throws EntryException, DirectoryException {
+	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, UserEntry entry) throws DirectoryException {
+	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
