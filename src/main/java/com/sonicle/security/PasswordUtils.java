@@ -33,12 +33,13 @@
  */
 package com.sonicle.security;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -48,12 +49,81 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.RandomStringUtils;
 
 /**
  *
  * @author malbinola
  */
 public class PasswordUtils {
+	private static final String LALPHA = "abcdefghijklmnopqrstuvwxyz";
+	private static final String UALPHA  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final String NUMBERS = "0123456789";
+	private static final String SPECIAL = "!@#$%^&*_=+-/";
+	
+	public static char[] generatePassword(int minLen, int maxLen, int minNoOfLCaseAlpha, int minNoOfUCaseAlpha, int minNoOfDigits, int minNoOfSpecialChars) {
+		char[] psw;
+		
+		if (minLen < maxLen) {
+			int rndIndex = new SecureRandom().nextInt((maxLen - minLen)+1) + minLen;
+			psw = new char[rndIndex];
+		} else {
+			psw = new char[minLen];
+		}
+		
+		Map<String, Integer> charGroupsUsed = new HashMap<>();
+		charGroupsUsed.put("lalpha", minNoOfLCaseAlpha);
+		charGroupsUsed.put("ualpha", minNoOfUCaseAlpha);
+		charGroupsUsed.put("numbers", minNoOfDigits);
+		charGroupsUsed.put("special", minNoOfSpecialChars);
+		int requiredCharactersLeft = minNoOfLCaseAlpha + minNoOfUCaseAlpha + minNoOfDigits + minNoOfSpecialChars;
+		
+		for (int i = 0; i < psw.length; i++) {
+			String selectableChars = "";
+			
+			// If we still have plenty of characters left to acheive our minimum requirements
+			if (requiredCharactersLeft < psw.length - i) {
+				// choose from any group at random
+				selectableChars = LALPHA + UALPHA + NUMBERS + SPECIAL;
+				
+			} else { // Choose from a random group that still needs to have a minimum required
+				// Choose only from a group that we need to satisfy a minimum for
+				for (Map.Entry<String, Integer> charGroup : charGroupsUsed.entrySet()) {
+					if ((int) charGroup.getValue() > 0) {
+						if ("lcase".equals(charGroup.getKey())) {
+							selectableChars += LALPHA;
+						} else if ("ualpha".equals(charGroup.getKey())) {
+							selectableChars += UALPHA;
+						} else if ("numbers".equals(charGroup.getKey())) {
+							selectableChars += NUMBERS;
+						} else if ("special".equals(charGroup.getKey())) {
+							selectableChars += SPECIAL;
+						}
+					}
+				}
+			}
+			
+			// Get the next random character
+			char nextChar = RandomStringUtils.random(1, selectableChars).charAt(0);
+			psw[i] = nextChar;
+			
+			// Now figure out where it came from, and decrement the appropriate minimum value.
+			String groupUsed = null;
+			if (LALPHA.indexOf(nextChar) > -1) {
+				groupUsed = "lalpha";
+			} else if (UALPHA.indexOf(nextChar) > -1) {
+				groupUsed = "ualpha";
+			} else if (NUMBERS.indexOf(nextChar) > -1) {
+				groupUsed = "numbers";
+			} else if (SPECIAL.indexOf(nextChar) > -1) {
+				groupUsed = "special";
+			}
+			charGroupsUsed.put(groupUsed, charGroupsUsed.get(groupUsed) - 1);
+			if (charGroupsUsed.get(groupUsed) >= 0) requiredCharactersLeft--;
+		}
+		
+		return psw;
+	}
 	
 	public static String encryptSHA(String string) {
 		if(string == null) return null;

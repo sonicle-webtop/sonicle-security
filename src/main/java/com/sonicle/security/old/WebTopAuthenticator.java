@@ -45,8 +45,8 @@ public class WebTopAuthenticator extends Authenticator {
 			String domainId=ad.getIDDomain();
 			OUser user=UserDAO.getInstance().selectByDomainUser(con, domainId, userId);
             if (user!=null) {
-                String credential=user.getPassword();
-                CredentialAlgorithm algorithm=CredentialAlgorithm.valueOf(user.getPasswordType());
+                String credential="";//user.getPassword();
+                CredentialAlgorithm algorithm=CredentialAlgorithm.valueOf(""/*user.getPasswordType()*/);
                 result=Credentials.compare(credential,algorithm,password);
                 if (result) {
                     principal.setCredential(credential);

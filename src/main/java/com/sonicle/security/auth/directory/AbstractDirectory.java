@@ -33,6 +33,7 @@
  */
 package com.sonicle.security.auth.directory;
 
+import com.sonicle.security.PasswordUtils;
 import com.sonicle.security.auth.DirectoryException;
 
 /**
@@ -41,18 +42,17 @@ import com.sonicle.security.auth.DirectoryException;
  */
 public abstract class AbstractDirectory implements Directory {
 	
-	/*
-	public AbstractConfigBuilder getConfigBuilder() {
-		return null;
-	}
-	*/
-	
 	public boolean hasCapability(final DirectoryCapability capability) {
 		return getCapabilities().contains(capability);
 	}
 	
 	public void ensureCapability(final DirectoryCapability capability) throws DirectoryException {
 		if(!hasCapability(capability)) throw new DirectoryException("Capability not supported");
+	}
+	
+	@Override
+	public char[] generatePassword(DirectoryOptions opts, boolean passwordPolicy) {
+		return PasswordUtils.generatePassword(8, 8, 1, 1, 1, 1);
 	}
 	
 	public static class AuthUser {
