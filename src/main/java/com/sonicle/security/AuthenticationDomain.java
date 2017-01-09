@@ -42,15 +42,15 @@ import java.net.URISyntaxException;
  */
 public class AuthenticationDomain {
 	private String domainId;
-	private String internetDomain;
+	private String internetName;
 	private URI authUri;
 	private String authUsername;
 	private char[] authPassword;
 	private ConnectionSecurity authConnSecurity;
 	
-	public AuthenticationDomain(String domainId, String internetDomain, String authUri, String authUsername, char[] authPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
+	public AuthenticationDomain(String domainId, String internetName, String authUri, String authUsername, char[] authPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
 		this.domainId = domainId;
-		this.internetDomain = internetDomain;
+		this.internetName = internetName;
 		this.authUri = new URI(authUri);
 		this.authUsername = authUsername;
 		this.authPassword = authPassword;
@@ -61,8 +61,8 @@ public class AuthenticationDomain {
 		return domainId;
 	}
 
-	public String getInternetDomain() {
-		return internetDomain;
+	public String getInternetName() {
+		return internetName;
 	}
 
 	public URI getAuthUri() {
