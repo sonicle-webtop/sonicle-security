@@ -128,8 +128,9 @@ public class Principal implements java.security.Principal, Serializable {
 		return this.hashedName;
 	}
 	
+	@Override
 	public String toString() {
-		return "[name='" + getName() + "' - description='" + displayName + "']";
+		return "[name='" + getName() + "' - displayName='" + displayName + "']";
 	}
 	
 	@Override
