@@ -21,7 +21,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *
  */
 public class Principal implements java.security.Principal, Serializable {
-	private AuthenticationDomain authenticationDomain = null;
+	private final AuthenticationDomain authenticationDomain;
+	private final boolean impersonated;
 	private String name = null;
 	private String hashedName = null;
 	private String domainId = null;
@@ -29,8 +30,9 @@ public class Principal implements java.security.Principal, Serializable {
 	private char[] password = null;
 	private String displayName = null;
 	
-	public Principal(AuthenticationDomain ad, String domainId, String userId, char[] password) {
+	public Principal(AuthenticationDomain ad, boolean impersonated, String domainId, String userId, char[] password) {
 		this.authenticationDomain = ad;
+		this.impersonated = impersonated;
 		this.name = DomainAccount.buildName(domainId, userId);
 		this.hashedName = Principal.buildHashedName(this.name);
 		this.domainId = domainId;
@@ -39,6 +41,8 @@ public class Principal implements java.security.Principal, Serializable {
 	}	
 	
 	public Principal(String domainId, String userId) {
+		authenticationDomain = null;
+		impersonated = false;
 		this.domainId = domainId;
 		this.userId = userId;
 		this.name = DomainAccount.buildName(this.domainId, userId);
@@ -47,6 +51,10 @@ public class Principal implements java.security.Principal, Serializable {
 
 	public AuthenticationDomain getAuthenticationDomain() {
 		return authenticationDomain;
+	}
+	
+	public boolean isImpersonated() {
+		return impersonated;
 	}
 	
 	public static String buildHashedName(String name) {
