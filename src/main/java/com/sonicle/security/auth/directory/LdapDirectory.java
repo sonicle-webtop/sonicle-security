@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.ldaptive.AddOperation;
 import org.ldaptive.AddRequest;
@@ -241,6 +242,10 @@ public class LdapDirectory extends AbstractDirectory {
 	
 	@Override
 	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException {
+		Check.notNull(opts);
+		Check.notNull(userId);
+		Check.notNull(newPassword);
+		
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -259,7 +264,25 @@ public class LdapDirectory extends AbstractDirectory {
 	
 	@Override
 	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet.");
+		Check.notNull(opts);
+		Check.notNull(userId);
+		Check.notNull(oldPassword);
+		Check.notNull(newPassword);
+		
+		LdapConfigBuilder builder = getConfigBuilder();
+		
+		try {
+			ensureCapability(DirectoryCapability.PASSWORD_WRITE);
+			String uid = sanitizeUsername(opts, userId);
+			
+			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
+			ConnectionFactory conFactory = createConnectionFactory(opts, true);
+			ldapChangePassword(conFactory, "uid=" + uid + "," + baseDn, oldPassword, newPassword);
+			
+		} catch(LdapException ex) {
+			logger.error("LdapError", ex);
+			throw new DirectoryException(ex);
+		}
 	}
 
 	@Override
