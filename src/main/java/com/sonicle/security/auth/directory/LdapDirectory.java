@@ -76,6 +76,8 @@ import org.ldaptive.auth.BindAuthenticationHandler;
 import org.ldaptive.auth.SearchDnResolver;
 import org.ldaptive.extended.PasswordModifyOperation;
 import org.ldaptive.extended.PasswordModifyRequest;
+import org.ldaptive.ssl.AllowAnyTrustManager;
+import org.ldaptive.ssl.SslConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -419,9 +421,11 @@ public class LdapDirectory extends AbstractDirectory {
 		ConnectionConfig config = new ConnectionConfig("ldap://" + host + ":" + port);
 		
 		if (EnumUtils.equals(security, ConnectionSecurity.SSL)) {
+			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
 			config.setLdapUrl("ldaps://" + host + ":" + port);
 			config.setUseSSL(true);
 		} else if (EnumUtils.equals(security, ConnectionSecurity.STARTTLS)) {
+			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
 			config.setUseStartTLS(true);
 		}
 		if(!StringUtils.isBlank(adminDn) && (adminPassword != null)) {
