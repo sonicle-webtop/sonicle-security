@@ -43,18 +43,18 @@ import java.net.URISyntaxException;
 public class AuthenticationDomain {
 	private String domainId;
 	private String internetName;
-	private URI authUri;
-	private String authUsername;
-	private char[] authPassword;
-	private ConnectionSecurity authConnSecurity;
+	private URI dirUri;
+	private String dirAdmin;
+	private char[] dirPassword;
+	private ConnectionSecurity dirConnSecurity;
 	
-	public AuthenticationDomain(String domainId, String internetName, String authUri, String authUsername, char[] authPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
+	public AuthenticationDomain(String domainId, String internetName, String dirUri, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
 		this.domainId = domainId;
 		this.internetName = internetName;
-		this.authUri = new URI(authUri);
-		this.authUsername = authUsername;
-		this.authPassword = authPassword;
-		this.authConnSecurity = authConSecurity;
+		this.dirUri = new URI(dirUri);
+		this.dirAdmin = dirAdmin;
+		this.dirPassword = dirPassword;
+		this.dirConnSecurity = authConSecurity;
 	}
 
 	public String getDomainId() {
@@ -65,19 +65,19 @@ public class AuthenticationDomain {
 		return internetName;
 	}
 
-	public URI getAuthUri() {
-		return authUri;
+	public URI getDirUri() {
+		return dirUri;
 	}
 
-	public String getAuthUsername() {
-		return authUsername;
+	public String getDirAdmin() {
+		return dirAdmin;
 	}
 
-	public char[] getAuthPassword() {
-		return authPassword;
+	public char[] getDirPassword() {
+		return dirPassword;
 	}
 	
-	public ConnectionSecurity getAuthConnSecurity() {
-		return authConnSecurity;
+	public ConnectionSecurity getDirConnSecurity() {
+		return dirConnSecurity;
 	}
 }
