@@ -135,14 +135,14 @@ public class LdapDirectory extends AbstractDirectory {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
-			final String[] attrs = new String[]{"uid", "givenName", "sn", "cn", "mail"};
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
-			
+			final String[] attrs = createUserReturnAttrs(opts);
+			final String userIdField = builder.getUserIdField(opts);
+			final String baseDn = builder.getUsersDn(opts);
 			ConnectionFactory conFactory = createConnectionFactory(opts, false);
-			AuthenticationResponse authResp = ldapAuthenticate(conFactory, baseDn, principal.getUserId(), principal.getPassword(), attrs);
+			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, principal.getUserId(), principal.getPassword(), attrs);
 			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
 			
-			return createUserEntry(authResp.getLdapEntry());
+			return createUserEntry(opts, authResp.getLdapEntry());
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);
@@ -157,14 +157,15 @@ public class LdapDirectory extends AbstractDirectory {
 		
 		try {
 			ensureCapability(DirectoryCapability.USERS_READ);
-			final String[] attrs = new String[]{"uid", "givenName", "sn", "cn", "mail"};
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
 			
+			final String[] attrs = createUserReturnAttrs(opts);
+			final String baseDn = builder.getUsersDn(opts);
+			final String filter = createUsersFilter(opts);
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
-			Collection<LdapEntry> ldEntries = ldapSearch(conFactory, baseDn, "(uid=*)", attrs);
+			Collection<LdapEntry> ldEntries = ldapSearch(conFactory, baseDn, filter, attrs);
 			
 			for(LdapEntry ldEntry : ldEntries) {
-				entries.add(createUserEntry(ldEntry));
+				entries.add(createUserEntry(opts, ldEntry));
 			}
 			return entries;
 		
@@ -176,7 +177,8 @@ public class LdapDirectory extends AbstractDirectory {
 	
 	@Override
 	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
-		LdapConfigBuilder builder = getConfigBuilder();
+		Check.notNull(opts);
+		Check.notNull(entry);
 		
 		try {
 			ensureCapability(DirectoryCapability.USERS_WRITE);
@@ -184,12 +186,11 @@ public class LdapDirectory extends AbstractDirectory {
 			if(StringUtils.isBlank(entry.firstName)) throw new DirectoryException("Missing value for 'firstName'");
 			if(StringUtils.isBlank(entry.lastName)) throw new DirectoryException("Missing value for 'lastName'");
 			if(StringUtils.isBlank(entry.displayName)) throw new DirectoryException("Missing value for 'displayName'");
-			
 			String uid = sanitizeUsername(opts, entry.userId);
 			
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
+			final String dn = createUserTargetDn(opts, uid);
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
-			ldapAdd(conFactory, "uid=" + uid + "," + baseDn, createLdapAddAttrs(entry));
+			ldapAdd(conFactory, dn, createLdapAddAttrs(opts, entry));
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);
@@ -203,7 +204,8 @@ public class LdapDirectory extends AbstractDirectory {
 	
 	@Override
 	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
-		LdapConfigBuilder builder = getConfigBuilder();
+		Check.notNull(opts);
+		Check.notNull(entry);
 		
 		try {
 			ensureCapability(DirectoryCapability.USERS_WRITE);
@@ -211,12 +213,11 @@ public class LdapDirectory extends AbstractDirectory {
 			if(StringUtils.isBlank(entry.firstName)) throw new DirectoryException("Missing value for 'firstName'");
 			if(StringUtils.isBlank(entry.lastName)) throw new DirectoryException("Missing value for 'lastName'");
 			if(StringUtils.isBlank(entry.displayName)) throw new DirectoryException("Missing value for 'displayName'");
-			
 			String uid = sanitizeUsername(opts, entry.userId);
 			
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
+			final String dn = createUserTargetDn(opts, uid);
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
-			ldapUpdate(conFactory, "uid=" + uid + "," + baseDn, createLdapUpdateMods(entry));
+			ldapUpdate(conFactory, dn, createLdapUpdateMods(opts, entry));
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);
@@ -226,15 +227,16 @@ public class LdapDirectory extends AbstractDirectory {
 	
 	@Override
 	public void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException {
-		LdapConfigBuilder builder = getConfigBuilder();
+		Check.notNull(opts);
+		Check.notNull(userId);
 		
 		try {
 			ensureCapability(DirectoryCapability.USERS_WRITE);
 			String uid = sanitizeUsername(opts, userId);
 			
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
+			final String dn = createUserTargetDn(opts, uid);
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
-			ldapDelete(conFactory, "uid=" + uid + "," + baseDn);
+			ldapDelete(conFactory, dn);
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);
@@ -248,15 +250,13 @@ public class LdapDirectory extends AbstractDirectory {
 		Check.notNull(userId);
 		Check.notNull(newPassword);
 		
-		LdapConfigBuilder builder = getConfigBuilder();
-		
 		try {
 			ensureCapability(DirectoryCapability.PASSWORD_WRITE);
 			String uid = sanitizeUsername(opts, userId);
 			
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
+			final String dn = createUserTargetDn(opts, uid);
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
-			ldapChangePassword(conFactory, "uid=" + uid + "," + baseDn, newPassword);
+			ldapChangePassword(conFactory, dn, newPassword);
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);
@@ -271,15 +271,13 @@ public class LdapDirectory extends AbstractDirectory {
 		Check.notNull(oldPassword);
 		Check.notNull(newPassword);
 		
-		LdapConfigBuilder builder = getConfigBuilder();
-		
 		try {
 			ensureCapability(DirectoryCapability.PASSWORD_WRITE);
 			String uid = sanitizeUsername(opts, userId);
 			
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
+			final String dn = createUserTargetDn(opts, uid);
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
-			ldapChangePassword(conFactory, "uid=" + uid + "," + baseDn, oldPassword, newPassword);
+			ldapChangePassword(conFactory, dn, oldPassword, newPassword);
 			
 		} catch(LdapException ex) {
 			logger.error("LdapError", ex);
@@ -292,29 +290,61 @@ public class LdapDirectory extends AbstractDirectory {
 		throw new UnsupportedOperationException("Not supported on this directory");
 	}
 	
-	protected List<LdapAttribute> createLdapAddAttrs(AuthUser userEntry) throws DirectoryException {
+	protected String[] createUserReturnAttrs(DirectoryOptions opts) {
+		LdapConfigBuilder builder = getConfigBuilder();
+		return new String[]{
+			builder.getUserIdField(opts), "givenName", "sn", "cn", "mail"
+		};
+	}
+	
+	protected String createUsersFilter(DirectoryOptions opts) {
+		LdapConfigBuilder builder = getConfigBuilder();
+		// Builds a filter string for searching users
+		return "(" + builder.getUserIdField(opts) + "=*)";
+	}
+	
+	protected String createUserTargetDn(DirectoryOptions opts, String userIdValue) {
+		LdapConfigBuilder builder = getConfigBuilder();
+		// Builds a Dn string for targetting a specific user
+		// Eg. uid=myuser,ou=people,dc=example,dc=com
+		final String baseDn = builder.getUsersDn(opts);
+		return builder.getUserIdField(opts) + "=" + userIdValue + "," + baseDn;
+	}
+	
+	protected List<LdapAttribute> createLdapAddAttrs(DirectoryOptions opts, AuthUser userEntry) throws DirectoryException {
+		LdapConfigBuilder builder = getConfigBuilder();
 		ArrayList<LdapAttribute> attrs = new ArrayList<>();
-		attrs.add(new LdapAttribute("uid", userEntry.userId));
-		attrs.add(new LdapAttribute("givenName", userEntry.firstName));
-		attrs.add(new LdapAttribute("sn", userEntry.lastName));
-		attrs.add(new LdapAttribute("cn", userEntry.displayName));
+		attrs.add(new LdapAttribute(builder.getUserIdField(opts), userEntry.userId));
+		attrs.add(new LdapAttribute(builder.getUserFirstnameField(opts), userEntry.firstName));
+		attrs.add(new LdapAttribute(builder.getUserLastnameField(opts), userEntry.lastName));
+		if (!StringUtils.isBlank(builder.getUserDisplayNameField(opts))) {
+			attrs.add(new LdapAttribute(builder.getUserDisplayNameField(opts), userEntry.displayName));
+		}
 		return attrs;
 	}
 	
-	protected List<AttributeModification> createLdapUpdateMods(AuthUser userEntry) throws DirectoryException {
+	protected List<AttributeModification> createLdapUpdateMods(DirectoryOptions opts, AuthUser userEntry) throws DirectoryException {
+		LdapConfigBuilder builder = getConfigBuilder();
 		ArrayList<AttributeModification> mods = new ArrayList<>();
-		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute("givenName", userEntry.firstName)));
-		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute("sn", userEntry.lastName)));
-		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute("cn", userEntry.displayName)));
+		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute(builder.getUserFirstnameField(opts), userEntry.firstName)));
+		mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute(builder.getUserLastnameField(opts), userEntry.lastName)));
+		if (!StringUtils.isBlank(builder.getUserDisplayNameField(opts))) {
+			mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute(builder.getUserDisplayNameField(opts), userEntry.displayName)));
+		}
 		return mods;
 	}
 	
-	protected AuthUser createUserEntry(LdapEntry ldapEntry) {
+	protected AuthUser createUserEntry(DirectoryOptions opts, LdapEntry ldapEntry) {
+		LdapConfigBuilder builder = getConfigBuilder();
 		AuthUser userEntry = new AuthUser();
-		userEntry.userId = getEntryAttribute(ldapEntry, "uid");
-		userEntry.firstName = getEntryAttribute(ldapEntry, "givenName");
-		userEntry.lastName = getEntryAttribute(ldapEntry, "sn");
-		userEntry.displayName = getEntryAttribute(ldapEntry, "cn");
+		userEntry.userId = getEntryAttribute(ldapEntry, builder.getUserIdField(opts));
+		userEntry.firstName = getEntryAttribute(ldapEntry, builder.getUserFirstnameField(opts));
+		userEntry.lastName = getEntryAttribute(ldapEntry, builder.getUserLastnameField(opts));
+		if (!StringUtils.isBlank(builder.getUserDisplayNameField(opts))) {
+			userEntry.displayName = getEntryAttribute(ldapEntry, builder.getUserDisplayNameField(opts));
+		} else {
+			userEntry.displayName = StringUtils.trim(StringUtils.join(userEntry.firstName, " ", userEntry.lastName));
+		}
 		return userEntry;
 	}
 	
@@ -395,10 +425,10 @@ public class LdapDirectory extends AbstractDirectory {
 		if(con != null) con.close();
 	}
 	
-	protected AuthenticationResponse ldapAuthenticate(ConnectionFactory conFactory, String baseDn, String userId, char[] password, String[] returnAttributes) throws LdapException {
+	protected AuthenticationResponse ldapAuthenticate(ConnectionFactory conFactory, String usernameField, String baseDn, String userId, char[] password, String[] returnAttributes) throws LdapException {
 		SearchDnResolver dnResolver = new SearchDnResolver(conFactory);
 		dnResolver.setBaseDn(baseDn);
-		dnResolver.setUserFilter("uid={user}");
+		dnResolver.setUserFilter(usernameField + "={user}");
 		Authenticator auth = new Authenticator(dnResolver, new BindAuthenticationHandler(conFactory));
 		return auth.authenticate(new AuthenticationRequest(userId, new Credential(password), returnAttributes));
 	}
@@ -411,7 +441,7 @@ public class LdapDirectory extends AbstractDirectory {
 		LdapConfigBuilder builder = getConfigBuilder();
 		String adminDn = null;
 		if(useAdminCredentials) {
-			adminDn = "cn=" + builder.getAdminUsername(opts) + "," + builder.getBaseDn(opts);
+			adminDn = builder.getAdminDn(opts);
 		}
 		char[] adminPassword = useAdminCredentials ? builder.getAdminPassword(opts) : null;
 		return createConnectionConfig(builder.getHost(opts), builder.getPort(opts), builder.getConnectionSecurity(opts), adminDn, adminPassword);

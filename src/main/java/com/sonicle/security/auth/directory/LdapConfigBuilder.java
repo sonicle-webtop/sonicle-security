@@ -45,13 +45,17 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 	protected static final String PARAM_HOST = "host";
 	protected static final String PARAM_PORT = "port";
 	protected static final String PARAM_CON_SECURITY = "conSecurity";
-	protected static final String PARAM_BASE_DN = "baseDn";
-	protected static final String PARAM_USERS_DN = "usersDn";
-	protected static final String PARAM_ADMIN_USERNAME = "adminUsername";
+	protected static final String PARAM_ADMIN_DN = "adminDn";
 	protected static final String PARAM_ADMIN_PASSWORD = "adminPassword";
+	protected static final String PARAM_USERS_DN = "usersDn"; // Base Dn for users
+	protected static final String PARAM_USER_ID_FIELD = "userIdField"; // Name of the id field (usually uid)
+	protected static final String PARAM_USER_FIRSTNAME_FIELD = "userFirstnameField"; // Name of the firstname field (usually givenName)
+	protected static final String PARAM_USER_LASTNAME_FIELD = "userLastnameField"; // Name of the lastname field (usually sn)
+	protected static final String PARAM_USER_DISPLAY_NAME_FIELD = "userDisplayNameField"; // Name of the displayName field 1 (usually cn)
 	
 	public static final String DEFAULT_HOST = "localhost";
 	public static final Integer DEFAULT_PORT = 389;
+	public static final String DEFAULT_USER_ID_FIELD = "uid";
 	
 	public static LdapConfigBuilder getInstance() {
 		return BUILDER;
@@ -81,28 +85,12 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 		setParam(opts, PARAM_CON_SECURITY, conSecurity);
 	}
 	
-	public String getBaseDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_BASE_DN, null);
+	public String getAdminDn(DirectoryOptions opts) {
+		return getString(opts, PARAM_ADMIN_DN, null);
 	}
 	
-	public void setBaseDn(DirectoryOptions opts, String baseDn) {
-		setParam(opts, PARAM_BASE_DN, baseDn);
-	}
-	
-	public String getUsersDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_USERS_DN, null);
-	}
-	
-	public void setUsersDn(DirectoryOptions opts, String usersDn) {
-		setParam(opts, PARAM_USERS_DN, usersDn);
-	}
-	
-	public String getAdminUsername(DirectoryOptions opts) {
-		return getString(opts, PARAM_ADMIN_USERNAME, null);
-	}
-	
-	public void setAdminUsername(DirectoryOptions opts, String adminUsername) {
-		setParam(opts, PARAM_ADMIN_USERNAME, adminUsername);
+	public void setAdminDn(DirectoryOptions opts, String userTreeDn) {
+		setParam(opts, PARAM_ADMIN_DN, userTreeDn);
 	}
 	
 	public char[] getAdminPassword(DirectoryOptions opts) {
@@ -113,9 +101,59 @@ public class LdapConfigBuilder extends AbstractConfigBuilder {
 		setParam(opts, PARAM_ADMIN_PASSWORD, adminPassword);
 	}
 	
-	public static String toDn(String domainName) {
+	public String getUsersDn(DirectoryOptions opts) {
+		return getString(opts, PARAM_USERS_DN, null);
+	}
+	
+	public void setUsersDn(DirectoryOptions opts, String usersDn) {
+		setParam(opts, PARAM_USERS_DN, usersDn);
+	}
+	
+	public String getUserIdField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_ID_FIELD, DEFAULT_USER_ID_FIELD);
+	}
+	
+	public void setUserIdField(DirectoryOptions opts, String userIdField) {
+		setParam(opts, PARAM_USER_ID_FIELD, userIdField);
+	}
+	
+	public String getUserFirstnameField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_FIRSTNAME_FIELD, null);
+	}
+	
+	public void setUserFirstnameField(DirectoryOptions opts, String userFirstnameField) {
+		setParam(opts, PARAM_USER_FIRSTNAME_FIELD, userFirstnameField);
+	}
+	
+	public String getUserLastnameField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_LASTNAME_FIELD, null);
+	}
+	
+	public void setUserLastnameField(DirectoryOptions opts, String userLastnameField) {
+		setParam(opts, PARAM_USER_LASTNAME_FIELD, userLastnameField);
+	}
+	
+	public String getUserDisplayNameField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_DISPLAY_NAME_FIELD, null);
+	}
+	
+	public void setUserDisplayNameField(DirectoryOptions opts, String userDisplayNameField) {
+		setParam(opts, PARAM_USER_DISPLAY_NAME_FIELD, userDisplayNameField);
+	}
+	
+	/*
+	public String getBaseDn(DirectoryOptions opts) {
+		return getString(opts, PARAM_BASE_DN, null);
+	}
+	
+	public void setBaseDn(DirectoryOptions opts, String baseDn) {
+		setParam(opts, PARAM_BASE_DN, baseDn);
+	}
+	*/
+	
+	public static String toDn(String internetName) {
 		StringBuilder dn = new StringBuilder();
-		for (String token : StringUtils.split(domainName, ".")) {
+		for (String token : StringUtils.split(internetName, ".")) {
 			dn.append(",dc=");
 			dn.append(token);
 		}

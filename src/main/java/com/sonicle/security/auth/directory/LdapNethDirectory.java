@@ -77,7 +77,7 @@ public class LdapNethDirectory extends LdapDirectory {
 	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
 		// path can be ignored!
 		int iport = (port == null) ? LdapNethConfigBuilder.DEFAULT_PORT : port;
-		return new URI(SCHEME, null, host, iport, "/" + LdapNethConfigBuilder.DEFAULT_USERS_DN, null, null);
+		return new URI(SCHEME, null, host, iport, null, null, null);
 	}
 	
 	@Override
@@ -85,19 +85,20 @@ public class LdapNethDirectory extends LdapDirectory {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
-			final String[] attrs = new String[]{"uid", "givenName", "sn", "cn", "mail"};
-			final String baseDn = builder.getUsersDn(opts) + "," + builder.getBaseDn(opts);
-			
+			final String[] attrs = createUserReturnAttrs(opts);
+			final String userIdField = builder.getUserIdField(opts);
+			final String baseDn = builder.getUsersDn(opts);
 			ConnectionFactory conFactory = createConnectionFactory(opts, false);
-			AuthenticationResponse authResp = ldapAuthenticate(conFactory, baseDn, principal.getUserId(), principal.getPassword(), attrs);
+			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, principal.getUserId(), principal.getPassword(), attrs);
 			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
 			
+			final String filter = createUserFilter(opts, principal.getUserId());
 			conFactory = createConnectionFactory(opts, true);
-			Collection<LdapEntry> entries = ldapSearch(conFactory, baseDn, "(uid=" + principal.getUserId() + ")", attrs);
+			Collection<LdapEntry> entries = ldapSearch(conFactory, baseDn, filter, attrs);
 			if(entries.size() != 1) throw new DirectoryException("Returned entries count must be 1");
 			
 			for(LdapEntry entry : entries) {
-				return createUserEntry(entry);
+				return createUserEntry(opts, entry);
 			}
 			return null; // This is not possible! :)
 			
@@ -107,11 +108,17 @@ public class LdapNethDirectory extends LdapDirectory {
 	}
 	
 	@Override
-	protected List<LdapAttribute> createLdapAddAttrs(AuthUser userEntry) throws DirectoryException {
-		List<LdapAttribute> attrs = super.createLdapAddAttrs(userEntry);
+	protected List<LdapAttribute> createLdapAddAttrs(DirectoryOptions opts, AuthUser userEntry) throws DirectoryException {
+		List<LdapAttribute> attrs = super.createLdapAddAttrs(opts, userEntry);
 		LdapAttribute objectClass = new LdapAttribute("objectClass");
 		objectClass.addStringValue("inetOrgPerson", "top");
 		attrs.add(objectClass);
 		return attrs;
+	}
+	
+	protected String createUserFilter(DirectoryOptions opts, String userIdValue) {
+		LdapConfigBuilder builder = getConfigBuilder();
+		// Builds a filter string for searching specific user
+		return "(" + builder.getUserIdField(opts) + "=" + userIdValue + ")";
 	}
 }
