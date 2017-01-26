@@ -212,8 +212,8 @@ public class AuthenticationDomain implements Serializable {
             if (odomain!=null) {
                 String description=odomain.getDescription();
                 String domain=odomain.getInternetName();
-                String authuri=odomain.getAuthUri();
-                String adminuser=odomain.getAuthUsername();
+                String authuri=odomain.getDirUri();
+                String adminuser=odomain.getDirAdmin();
 				String adminpassword="";
 				
 				// TODO: how to manage auth password here??
@@ -223,9 +223,9 @@ public class AuthenticationDomain implements Serializable {
 				
                 int order=1;
                 boolean enabled=odomain.getEnabled();
-				Boolean casesensitive = odomain.getAuthCaseSensitive();
+				Boolean casesensitive = odomain.getDirCaseSensitive();
 				Boolean autocreation = odomain.getUserAutoCreation();
-				Boolean advsecurity = odomain.getAuthPasswordPolicy();
+				Boolean advsecurity = odomain.getDirPasswordPolicy();
                 ad=new AuthenticationDomain(domainId, description, domain, authuri, adminuser, adminpassword, order, enabled, casesensitive, autocreation, advsecurity);
             }
         } catch(Exception exc) {

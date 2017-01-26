@@ -65,14 +65,14 @@ public class SonicleLogin {
                 if (odomain!=null) {
                     description=odomain.getDescription();
                     domain=odomain.getInternetName();
-                    authuri=odomain.getAuthUri();
-                    adminuser=odomain.getAuthUsername();
-                    adminpassword=odomain.getAuthPassword();
+                    authuri=odomain.getDirUri();
+                    adminuser=odomain.getDirAdmin();
+                    adminpassword=odomain.getDirPassword();
                     //order???
                     enabled=odomain.getEnabled();
-					casesensitive = odomain.getAuthCaseSensitive();
+					casesensitive = odomain.getDirCaseSensitive();
 					autocreation = odomain.getUserAutoCreation();
-					advsecurity = odomain.getAuthPasswordPolicy();
+					advsecurity = odomain.getDirPasswordPolicy();
                 }
             } else {
 //                fullname="admin@";
