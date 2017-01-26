@@ -47,14 +47,16 @@ public class AuthenticationDomain {
 	private String dirAdmin;
 	private char[] dirPassword;
 	private ConnectionSecurity dirConnSecurity;
+	private String dirParameters;
 	
-	public AuthenticationDomain(String domainId, String internetName, String dirUri, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity) throws URISyntaxException {
+	public AuthenticationDomain(String domainId, String internetName, String dirUri, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity, String dirParameters) throws URISyntaxException {
 		this.domainId = domainId;
 		this.internetName = internetName;
 		this.dirUri = new URI(dirUri);
 		this.dirAdmin = dirAdmin;
 		this.dirPassword = dirPassword;
 		this.dirConnSecurity = authConSecurity;
+		this.dirParameters = dirParameters;
 	}
 
 	public String getDomainId() {
@@ -79,5 +81,9 @@ public class AuthenticationDomain {
 	
 	public ConnectionSecurity getDirConnSecurity() {
 		return dirConnSecurity;
+	}
+	
+	public String getDirParameters() {
+		return dirParameters;
 	}
 }
