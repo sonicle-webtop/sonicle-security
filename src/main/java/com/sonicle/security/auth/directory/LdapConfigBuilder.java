@@ -33,147 +33,14 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.ConnectionSecurity;
-import org.apache.commons.lang3.StringUtils;
-
 /**
  *
  * @author malbinola
  */
-public class LdapConfigBuilder extends AbstractConfigBuilder {
+public final class LdapConfigBuilder extends AbstractLdapConfigBuilder {
 	private static final LdapConfigBuilder BUILDER = new LdapConfigBuilder();
-	protected static final String PARAM_HOST = "host";
-	protected static final String PARAM_PORT = "port";
-	protected static final String PARAM_CON_SECURITY = "conSecurity";
-	protected static final String PARAM_ADMIN_DN = "adminDn";
-	protected static final String PARAM_ADMIN_PASSWORD = "adminPassword";
-	protected static final String PARAM_LOGIN_DN = "loginDn"; // Base Dn for authentication
-	protected static final String PARAM_LOGIN_FILTER = "loginFilter"; // Filter to use during authentication
-	protected static final String PARAM_USER_DN = "userDn"; // Base Dn for operations on user
-	protected static final String PARAM_USER_FILTER = "userFilter"; // Filter to use during users listing
-	protected static final String PARAM_USER_ID_FIELD = "userIdField"; // Name of the id field (usually uid)
-	protected static final String PARAM_USER_FIRSTNAME_FIELD = "userFirstnameField"; // Name of the firstname field (usually givenName)
-	protected static final String PARAM_USER_LASTNAME_FIELD = "userLastnameField"; // Name of the lastname field (usually sn)
-	protected static final String PARAM_USER_DISPLAYNAME_FIELD = "userDisplayNameField"; // Name of the displayName field 1 (usually cn)
-	
-	public static final String DEFAULT_HOST = "localhost";
-	public static final Integer DEFAULT_PORT = 389;
-	public static final String DEFAULT_USER_ID_FIELD = "uid";
 	
 	public static LdapConfigBuilder getInstance() {
 		return BUILDER;
-	}
-	
-	public String getHost(DirectoryOptions opts) {
-		return getString(opts, PARAM_HOST, DEFAULT_HOST);
-	}
-	
-	public void setHost(DirectoryOptions opts, String host) {
-		setParam(opts, PARAM_HOST, host);
-	}
-	
-	public int getPort(DirectoryOptions opts) {
-		return getInteger(opts, PARAM_PORT, DEFAULT_PORT);
-	}
-	
-	public void setPort(DirectoryOptions opts, int port) {
-		if (port > -1) setParam(opts, PARAM_PORT, port);
-	}
-	
-	public ConnectionSecurity getConnectionSecurity(DirectoryOptions opts) {
-		return (ConnectionSecurity)getParam(opts, PARAM_CON_SECURITY);
-	}
-	
-	public void setConnectionSecurity(DirectoryOptions opts, ConnectionSecurity conSecurity) {
-		setParam(opts, PARAM_CON_SECURITY, conSecurity);
-	}
-	
-	public String getAdminDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_ADMIN_DN, null);
-	}
-	
-	public void setAdminDn(DirectoryOptions opts, String userTreeDn) {
-		setParam(opts, PARAM_ADMIN_DN, userTreeDn);
-	}
-	
-	public char[] getAdminPassword(DirectoryOptions opts) {
-		return (char[]) getParam(opts, PARAM_ADMIN_PASSWORD);
-	}
-	
-	public void setAdminPassword(DirectoryOptions opts, char[] adminPassword) {
-		setParam(opts, PARAM_ADMIN_PASSWORD, adminPassword);
-	}
-	
-	public String getLoginDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_LOGIN_DN, null);
-	}
-	
-	public void setLoginDn(DirectoryOptions opts, String loginDn) {
-		setParam(opts, PARAM_LOGIN_DN, loginDn);
-	}
-	
-	public String getLoginFilter(DirectoryOptions opts) {
-		return getString(opts, PARAM_LOGIN_FILTER, null);
-	}
-	
-	public void setLoginFilter(DirectoryOptions opts, String loginFilter) {
-		setParam(opts, PARAM_LOGIN_FILTER, loginFilter);
-	}
-	
-	public String getUserDn(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_DN, null);
-	}
-	
-	public void setUserDn(DirectoryOptions opts, String userDn) {
-		setParam(opts, PARAM_USER_DN, userDn);
-	}
-	
-	public String getUserFilter(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_FILTER, null);
-	}
-	
-	public void setUserFilter(DirectoryOptions opts, String userFilter) {
-		setParam(opts, PARAM_USER_FILTER, userFilter);
-	}
-	
-	public String getUserIdField(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_ID_FIELD, DEFAULT_USER_ID_FIELD);
-	}
-	
-	public void setUserIdField(DirectoryOptions opts, String userIdField) {
-		setParam(opts, PARAM_USER_ID_FIELD, userIdField);
-	}
-	
-	public String getUserFirstnameField(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_FIRSTNAME_FIELD, null);
-	}
-	
-	public void setUserFirstnameField(DirectoryOptions opts, String userFirstnameField) {
-		setParam(opts, PARAM_USER_FIRSTNAME_FIELD, userFirstnameField);
-	}
-	
-	public String getUserLastnameField(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_LASTNAME_FIELD, null);
-	}
-	
-	public void setUserLastnameField(DirectoryOptions opts, String userLastnameField) {
-		setParam(opts, PARAM_USER_LASTNAME_FIELD, userLastnameField);
-	}
-	
-	public String getUserDisplayNameField(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_DISPLAYNAME_FIELD, null);
-	}
-	
-	public void setUserDisplayNameField(DirectoryOptions opts, String userDisplayNameField) {
-		setParam(opts, PARAM_USER_DISPLAYNAME_FIELD, userDisplayNameField);
-	}
-	
-	public static String toDn(String internetName) {
-		StringBuilder dn = new StringBuilder();
-		for (String token : StringUtils.split(internetName, ".")) {
-			dn.append(",dc=");
-			dn.append(token);
-		}
-		return StringUtils.substring(dn.toString(), 1);
 	}
 }

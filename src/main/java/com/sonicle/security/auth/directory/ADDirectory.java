@@ -33,9 +33,16 @@
  */
 package com.sonicle.security.auth.directory;
 
+import com.sonicle.security.Principal;
+import com.sonicle.security.auth.DirectoryException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.LdapException;
+import org.ldaptive.auth.AuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * @author malbinola
  * https://social.technet.microsoft.com/wiki/contents/articles/5392.active-directory-ldap-syntax-filters.aspx
  */
-public class ADDirectory extends LdapDirectory {
+public class ADDirectory extends AbstractLdapDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(ADDirectory.class);
 	public static final String SCHEME = "ad";
 
@@ -62,5 +69,32 @@ public class ADDirectory extends LdapDirectory {
 	@Override
 	public ADConfigBuilder getConfigBuilder() {
 		return ADConfigBuilder.getInstance();
+	}
+	
+	@Override
+	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+		int iport = (port == null) ? LdapConfigBuilder.DEFAULT_PORT : port;
+		return new URI(SCHEME, null, host, iport, path, null, null);
+	}
+	
+	@Override
+	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+		AbstractLdapConfigBuilder builder = getConfigBuilder();
+		
+		try {
+			final String userIdField = builder.getUserIdField(opts);
+			final String baseDn = builder.getLoginDn(opts);
+			final String extraFilter = builder.getLoginFilter(opts);
+			final String[] attrs = createUserReturnAttrs(opts);
+			ConnectionFactory conFactory = createConnectionFactory(opts, true); // Connection cannot be anonymous
+			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, extraFilter, principal.getUserId(), principal.getPassword(), attrs);
+			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
+			
+			return createUserEntry(opts, authResp.getLdapEntry());
+			
+		} catch(LdapException ex) {
+			logger.error("LdapError", ex);
+			throw new DirectoryException(ex);
+		}
 	}
 }

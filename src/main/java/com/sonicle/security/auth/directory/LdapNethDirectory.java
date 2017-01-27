@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author malbinola
  */
-public class LdapNethDirectory extends LdapDirectory {
+public final class LdapNethDirectory extends AbstractLdapDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapNethDirectory.class);
 	public static final String SCHEME = "ldapneth";
 	
@@ -82,7 +82,7 @@ public class LdapNethDirectory extends LdapDirectory {
 	
 	@Override
 	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
-		LdapConfigBuilder builder = getConfigBuilder();
+		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
 			final String userIdField = builder.getUserIdField(opts);
@@ -120,7 +120,7 @@ public class LdapNethDirectory extends LdapDirectory {
 	}
 	
 	protected String createUserFilter(DirectoryOptions opts, String userIdValue) {
-		LdapConfigBuilder builder = getConfigBuilder();
+		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		// Builds a filter string for searching specific user
 		return "(" + builder.getUserIdField(opts) + "=" + userIdValue + ")";
 	}

@@ -37,7 +37,7 @@ package com.sonicle.security.auth.directory;
  *
  * @author malbinola
  */
-public class ADConfigBuilder extends LdapConfigBuilder {
+public class ADConfigBuilder extends AbstractLdapConfigBuilder {
 	private static final ADConfigBuilder BUILDER = new ADConfigBuilder();
 	public static final String DEFAULT_LOGIN_FILTER = "&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
 	public static final String DEFAULT_USER_FILTER = "&(objectClass=person)(objectClass=user)";
