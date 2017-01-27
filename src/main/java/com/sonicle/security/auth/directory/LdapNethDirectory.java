@@ -85,24 +85,27 @@ public class LdapNethDirectory extends LdapDirectory {
 		LdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
-			final String[] attrs = createUserReturnAttrs(opts);
 			final String userIdField = builder.getUserIdField(opts);
-			final String baseDn = builder.getUsersDn(opts);
+			final String baseDn = builder.getLoginDn(opts);
+			final String extraFilter = builder.getLoginFilter(opts);
+			final String[] attrs = createUserReturnAttrs(opts);
 			ConnectionFactory conFactory = createConnectionFactory(opts, false);
-			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, principal.getUserId(), principal.getPassword(), attrs);
+			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, extraFilter, principal.getUserId(), principal.getPassword(), attrs);
 			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
 			
-			final String filter = createUserFilter(opts, principal.getUserId());
+			final String baseDn2 = builder.getLoginDn(opts);
+			final String filter = joinFilters(createUserTargetFilter(opts, principal.getUserId()), builder.getUserFilter(opts));
 			conFactory = createConnectionFactory(opts, true);
-			Collection<LdapEntry> entries = ldapSearch(conFactory, baseDn, filter, attrs);
-			if(entries.size() != 1) throw new DirectoryException("Returned entries count must be 1");
+			Collection<LdapEntry> ldEntries = ldapSearch(conFactory, baseDn2, filter, attrs);
+			if(ldEntries.size() != 1) throw new DirectoryException("Returned entries count must be 1");
 			
-			for(LdapEntry entry : entries) {
+			for(LdapEntry entry : ldEntries) {
 				return createUserEntry(opts, entry);
 			}
 			return null; // This is not possible! :)
 			
 		} catch(LdapException ex) {
+			logger.error("LdapError", ex);
 			throw new DirectoryException(ex);
 		}
 	}

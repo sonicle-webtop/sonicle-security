@@ -33,26 +33,26 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.Principal;
-import com.sonicle.security.auth.DirectoryException;
-import com.sonicle.security.auth.EntryException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author malbinola
+ * https://social.technet.microsoft.com/wiki/contents/articles/5392.active-directory-ldap-syntax-filters.aspx
  */
-public class ADDirectory extends AbstractDirectory {
+public class ADDirectory extends LdapDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(ADDirectory.class);
 	public static final String SCHEME = "ad";
 
-	static final Collection<DirectoryCapability> CAPABILITIES = Collections.EMPTY_LIST;
+	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
+		EnumSet.of(
+			DirectoryCapability.USERS_READ
+		)
+	);
 	
 	@Override
 	public Collection<DirectoryCapability> getCapabilities() {
@@ -63,66 +63,4 @@ public class ADDirectory extends AbstractDirectory {
 	public ADConfigBuilder getConfigBuilder() {
 		return ADConfigBuilder.getInstance();
 	}
-
-	@Override
-	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public String sanitizeUsername(DirectoryOptions opts, String username) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public boolean validateUsername(DirectoryOptions opts, String username) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public boolean validatePasswordPolicy(DirectoryOptions opts, char[] password) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws EntryException, DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public List<String> listGroups(DirectoryOptions opts, String domainId) throws DirectoryException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-	
-	
 }

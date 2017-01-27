@@ -33,43 +33,50 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.ConnectionSecurity;
-
 /**
  *
  * @author malbinola
  */
-public class ADConfigBuilder extends AbstractConfigBuilder {
+public class ADConfigBuilder extends LdapConfigBuilder {
 	private static final ADConfigBuilder BUILDER = new ADConfigBuilder();
-	protected static final String PARAM_HOST = "host";
-	protected static final String PARAM_PORT = "port";
-	protected static final String PARAM_CON_SECURITY = "conSecurity";
+	public static final String DEFAULT_LOGIN_FILTER = "&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+	public static final String DEFAULT_USER_FILTER = "&(objectClass=person)(objectClass=user)";
+	public static final String DEFAULT_USER_ID_FIELD = "sAMAccountName";
+	public static final String DEFAULT_USER_FIRSTNAME_FIELD = "givenName";
+	public static final String DEFAULT_USER_LASTNAME_FIELD = "sn";
+	public static final String DEFAULT_USER_DISPLAYNAME_FIELD = "cn";
 	
 	public static ADConfigBuilder getInstance() {
 		return BUILDER;
 	}
-	
-	public String getHost(DirectoryOptions opts) {
-		return getString(opts, PARAM_HOST, null);
+
+	@Override
+	public String getLoginFilter(DirectoryOptions opts) {
+		return getString(opts, PARAM_LOGIN_FILTER, DEFAULT_LOGIN_FILTER);
 	}
 	
-	public void setHost(DirectoryOptions opts, String host) {
-		setParam(opts, PARAM_HOST, host);
+	@Override
+	public String getUserFilter(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_FILTER, DEFAULT_USER_FILTER);
 	}
 	
-	public Integer getPort(DirectoryOptions opts) {
-		return getInteger(opts, PARAM_PORT, null);
+	@Override
+	public String getUserIdField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_ID_FIELD, DEFAULT_USER_ID_FIELD);
 	}
 	
-	public void setPort(DirectoryOptions opts, int port) {
-		if(port > -1) setParam(opts, PARAM_PORT, port);
+	@Override
+	public String getUserFirstnameField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_FIRSTNAME_FIELD, DEFAULT_USER_FIRSTNAME_FIELD);
 	}
 	
-	public ConnectionSecurity getConnectionSecurity(DirectoryOptions opts) {
-		return (ConnectionSecurity)getParam(opts, PARAM_CON_SECURITY);
+	@Override
+	public String getUserLastnameField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_LASTNAME_FIELD, DEFAULT_USER_LASTNAME_FIELD);
 	}
 	
-	public void setConnectionSecurity(DirectoryOptions opts, ConnectionSecurity conSecurity) {
-		setParam(opts, PARAM_CON_SECURITY, conSecurity);
+	@Override
+	public String getUserDisplayNameField(DirectoryOptions opts) {
+		return getString(opts, PARAM_USER_DISPLAYNAME_FIELD, DEFAULT_USER_DISPLAYNAME_FIELD);
 	}
 }

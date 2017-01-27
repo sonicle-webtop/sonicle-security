@@ -41,10 +41,18 @@ public class LdapNethConfigBuilder extends LdapConfigBuilder {
 	private static final LdapNethConfigBuilder BUILDER = new LdapNethConfigBuilder();
 	public static final String DEFAULT_USER_FIRSTNAME_FIELD = "givenName";
 	public static final String DEFAULT_USER_LASTNAME_FIELD = "sn";
-	public static final String DEFAULT_USER_DISPLAY_NAME_FIELD = "cn";
+	public static final String DEFAULT_USER_DISPLAYNAME_FIELD = "cn";
 	
 	public static LdapNethConfigBuilder getInstance() {
 		return BUILDER;
+	}
+	
+	public void setSpecificLoginDn(DirectoryOptions opts, String internetName) {
+		setParam(opts, PARAM_USER_DN, "ou=people," + toDn(internetName));
+	}
+	
+	public void setSpecificUserDn(DirectoryOptions opts, String internetName) {
+		setParam(opts, PARAM_USER_DN, "ou=people," + toDn(internetName));
 	}
 	
 	@Override
@@ -55,11 +63,6 @@ public class LdapNethConfigBuilder extends LdapConfigBuilder {
 	@Override
 	public int getPort(DirectoryOptions opts) {
 		return getInteger(opts, PARAM_PORT, DEFAULT_PORT);
-	}
-	
-	@Override
-	public void setUsersDn(DirectoryOptions opts, String internetName) {
-		setParam(opts, PARAM_USERS_DN, "ou=people," + toDn(internetName));
 	}
 	
 	@Override
@@ -74,6 +77,6 @@ public class LdapNethConfigBuilder extends LdapConfigBuilder {
 	
 	@Override
 	public String getUserDisplayNameField(DirectoryOptions opts) {
-		return getString(opts, PARAM_USER_DISPLAY_NAME_FIELD, DEFAULT_USER_DISPLAY_NAME_FIELD);
+		return getString(opts, PARAM_USER_DISPLAYNAME_FIELD, DEFAULT_USER_DISPLAYNAME_FIELD);
 	}
 }
