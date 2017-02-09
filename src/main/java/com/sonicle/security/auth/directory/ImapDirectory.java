@@ -149,7 +149,7 @@ public class ImapDirectory extends AbstractDirectory {
 	
 	private Store createStore(DirectoryOptions opts) throws NoSuchProviderException {
 		ImapConfigBuilder builder = getConfigBuilder();
-		Properties props = System.getProperties();
+		Properties props = new Properties(System.getProperties());
 		
 		String imapProto = EnumUtils.equals(builder.getConnectionSecurity(opts), ConnectionSecurity.SSL) ? "imaps" : "imap";
 		
