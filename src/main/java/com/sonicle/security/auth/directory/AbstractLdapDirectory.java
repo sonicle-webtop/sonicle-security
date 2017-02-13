@@ -163,9 +163,9 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		try {
 			ensureCapability(DirectoryCapability.USERS_WRITE);
 			if(StringUtils.isBlank(entry.userId)) throw new DirectoryException("Missing value for 'userId'");
+			if(StringUtils.isBlank(entry.displayName)) throw new DirectoryException("Missing value for 'displayName'");
 			if(StringUtils.isBlank(entry.firstName)) throw new DirectoryException("Missing value for 'firstName'");
 			if(StringUtils.isBlank(entry.lastName)) throw new DirectoryException("Missing value for 'lastName'");
-			if(StringUtils.isBlank(entry.displayName)) throw new DirectoryException("Missing value for 'displayName'");
 			String uid = sanitizeUsername(opts, entry.userId);
 			
 			final String dn = createUserTargetDn(opts, uid);
@@ -336,8 +336,10 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		userEntry.lastName = getEntryAttribute(ldapEntry, builder.getUserLastnameField(opts));
 		if (!StringUtils.isBlank(builder.getUserDisplayNameField(opts))) {
 			userEntry.displayName = getEntryAttribute(ldapEntry, builder.getUserDisplayNameField(opts));
-		} else {
+		} else if (!StringUtils.isBlank(userEntry.firstName) || !StringUtils.isBlank(userEntry.lastName)) {
 			userEntry.displayName = StringUtils.trim(StringUtils.join(userEntry.firstName, " ", userEntry.lastName));
+		} else {
+			userEntry.displayName = userEntry.userId;
 		}
 		return userEntry;
 	}

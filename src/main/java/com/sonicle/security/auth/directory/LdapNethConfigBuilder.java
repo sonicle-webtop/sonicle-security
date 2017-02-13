@@ -41,14 +41,14 @@ public final class LdapNethConfigBuilder extends AbstractLdapConfigBuilder {
 	private static final LdapNethConfigBuilder BUILDER = new LdapNethConfigBuilder();
 	public static final String DEFAULT_USER_FIRSTNAME_FIELD = "givenName";
 	public static final String DEFAULT_USER_LASTNAME_FIELD = "sn";
-	public static final String DEFAULT_USER_DISPLAYNAME_FIELD = "cn";
+	public static final String DEFAULT_USER_DISPLAYNAME_FIELD = "gecos";
 	
 	public static LdapNethConfigBuilder getInstance() {
 		return BUILDER;
 	}
 	
 	public void setSpecificLoginDn(DirectoryOptions opts, String internetName) {
-		setLoginDn(opts, "ou=people," + toDn(internetName));
+		setLoginDn(opts, toDn(internetName));
 	}
 	
 	public void setSpecificUserDn(DirectoryOptions opts, String internetName) {

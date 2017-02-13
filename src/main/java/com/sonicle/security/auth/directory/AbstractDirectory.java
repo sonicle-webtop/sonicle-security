@@ -64,11 +64,11 @@ public abstract class AbstractDirectory implements Directory {
 		
 		public AuthUser() {}
 		
-		public AuthUser(String userId, String firstName, String lastName, String displayName, String email) {
+		public AuthUser(String userId, String displayName, String firstName, String lastName, String email) {
 			this.userId = userId;
+			this.displayName = displayName;
 			this.firstName = firstName;
 			this.lastName = lastName;
-			this.displayName = displayName;
 			this.email = email;
 		}
 	}
