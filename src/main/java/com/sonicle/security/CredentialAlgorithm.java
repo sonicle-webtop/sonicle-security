@@ -35,10 +35,6 @@ package com.sonicle.security;
 
 import com.novell.ldap.util.Base64;
 import java.security.MessageDigest;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +95,8 @@ public enum CredentialAlgorithm {
 		try {
 			MessageDigest md = MessageDigest.getInstance(algorithm);
 			md.update(s.getBytes("UTF-8"));
+			//TODO: rimuovere la dipendenza al Base64 della Novell, ottenendo
+			//il medesimo risultato con la commons
 			return Base64.encode(md.digest());
 		} catch(Exception ex) {
 			logger.error("Crypto error", ex);

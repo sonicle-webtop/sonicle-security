@@ -6,12 +6,29 @@
 	<version>1.0</version>
 	<packaging>jar</packaging>
 	<name>sonicle-security</name>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
+	
 	<dependencies>
+		<dependency>
+			<groupId>com.sonicle.commons</groupId>
+			<artifactId>sonicle-commons</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.6</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -54,52 +71,32 @@
 					<groupId>org.apache.maven.scm</groupId>
 					<artifactId>maven-scm-provider-svnexe</artifactId>
 				</exclusion>
-			 <exclusion>
-			  <groupId>commons-logging</groupId>
-			  <artifactId>commons-logging</artifactId>
-			 </exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
-	 <dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-api</artifactId>
-	  <version>1.7.6</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>jcl-over-slf4j</artifactId>
-	  <version>1.7.6</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>com.sonicle.webtop</groupId>
-	  <artifactId>webtop-core-db</artifactId>
-	  <version>5.0.0</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>com.sonicle.commons</groupId>
-	  <artifactId>sonicle-commons</artifactId>
-	  <version>1.0</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>commons-configuration</groupId>
-	  <artifactId>commons-configuration</artifactId>
-	  <version>1.10</version>
-	  <exclusions>
-	   <exclusion>
-	    <artifactId>commons-logging</artifactId>
-	    <groupId>commons-logging</groupId>
-	   </exclusion>
-	  </exclusions>
-	 </dependency>
-	 <dependency>
-	  <groupId>net.sf.qualitycheck</groupId>
-	  <artifactId>quality-check</artifactId>
-	  <version>1.3</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.ldaptive</groupId>
-	  <artifactId>ldaptive</artifactId>
-	  <version>1.1.0</version>
-	 </dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.10</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.qualitycheck</groupId>
+			<artifactId>quality-check</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ldaptive</groupId>
+			<artifactId>ldaptive</artifactId>
+			<version>1.1.0</version>
+		</dependency>
 	</dependencies>
 </project>
