@@ -39,30 +39,21 @@ package com.sonicle.security.auth.directory;
  */
 public final class LdapNethConfigBuilder extends AbstractLdapConfigBuilder {
 	private static final LdapNethConfigBuilder BUILDER = new LdapNethConfigBuilder();
-	public static final String DEFAULT_USER_FIRSTNAME_FIELD = "givenName";
-	public static final String DEFAULT_USER_LASTNAME_FIELD = "sn";
-	public static final String DEFAULT_USER_DISPLAYNAME_FIELD = "gecos";
+	//public static final String DEFAULT_USER_FIRSTNAME_FIELD = "givenName";
+	//public static final String DEFAULT_USER_LASTNAME_FIELD = "sn";
+	//public static final String DEFAULT_USER_DISPLAYNAME_FIELD = "gecos";
 	
 	public static LdapNethConfigBuilder getInstance() {
 		return BUILDER;
 	}
 	
+	/*
 	public void setSpecificLoginDn(DirectoryOptions opts, String internetName) {
 		setLoginDn(opts, toDn(internetName));
 	}
 	
 	public void setSpecificUserDn(DirectoryOptions opts, String internetName) {
 		setUserDn(opts, "ou=people," + toDn(internetName));
-	}
-	
-	@Override
-	public String getHost(DirectoryOptions opts) {
-		return getString(opts, PARAM_HOST, DEFAULT_HOST);
-	}
-	
-	@Override
-	public int getPort(DirectoryOptions opts) {
-		return getInteger(opts, PARAM_PORT, DEFAULT_PORT);
 	}
 	
 	@Override
@@ -79,4 +70,5 @@ public final class LdapNethConfigBuilder extends AbstractLdapConfigBuilder {
 	public String getUserDisplayNameField(DirectoryOptions opts) {
 		return getString(opts, PARAM_USER_DISPLAYNAME_FIELD, DEFAULT_USER_DISPLAYNAME_FIELD);
 	}
+	*/
 }

@@ -39,12 +39,8 @@ import com.sonicle.security.Principal;
 import com.sonicle.security.ConnectionSecurity;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 import net.sf.qualitycheck.Check;
@@ -57,6 +53,7 @@ import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.Connection;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
+import org.ldaptive.ConnectionInitializer;
 import org.ldaptive.Credential;
 import org.ldaptive.DefaultConnectionFactory;
 import org.ldaptive.DeleteOperation;
@@ -77,10 +74,8 @@ import org.ldaptive.auth.SearchDnResolver;
 import org.ldaptive.extended.PasswordModifyOperation;
 import org.ldaptive.extended.PasswordModifyRequest;
 import org.ldaptive.provider.jndi.JndiProvider;
-import org.ldaptive.provider.jndi.JndiProviderConfig;
 import org.ldaptive.ssl.AllowAnyHostnameVerifier;
 import org.ldaptive.ssl.AllowAnyTrustManager;
-import org.ldaptive.ssl.HostnameVerifyingTrustManager;
 import org.ldaptive.ssl.SslConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,9 +112,11 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 			final String userIdField = builder.getUserIdField(opts);
 			final String baseDn = builder.getLoginDn(opts);
 			final String extraFilter = builder.getLoginFilter(opts);
+			final boolean subtree = builder.getLoginSubtreeSearch(opts);
 			final String[] attrs = createUserReturnAttrs(opts);
-			ConnectionFactory conFactory = createConnectionFactory(opts, false);
-			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, extraFilter, principal.getUserId(), principal.getPassword(), attrs);
+			final boolean anonymous = builder.isAdminAnonymous(opts);
+			ConnectionFactory conFactory = createConnectionFactory(opts, !anonymous);
+			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, extraFilter, subtree, principal.getUserId(), principal.getPassword(), attrs);
 			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
 			
 			return createUserEntry(opts, authResp.getLdapEntry());
@@ -347,6 +344,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	protected Collection<LdapEntry> ldapSearch(ConnectionFactory conFactory, String baseDn, String filter, String[] returnAttributes) throws LdapException {
 		SearchExecutor executor = new SearchExecutor();
 		executor.setBaseDn(baseDn);
+		logger.debug("ldapSearch [{baseDn: {}, filter: {}]", baseDn, filter);
 		SearchResult result = executor.search(conFactory, filter, returnAttributes).getResult();
 		return result.getEntries();
 	}
@@ -355,7 +353,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		Connection con = null;
 		
 		try {
-			logger.debug("Adding [{}]", dn);
+			logger.debug("ldapAdd [{dn: {}", dn);
 			con = conFactory.getConnection();
 			con.open();
 			AddOperation opAdd = new AddOperation(con);
@@ -369,7 +367,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		Connection con = null;
 		
 		try {
-			logger.debug("Modifying [{}]", dn);
+			logger.debug("ldapUpdate [{dn: {}", dn);
 			con = conFactory.getConnection();
 			con.open();
 			ModifyOperation opMod = new ModifyOperation(con);
@@ -383,7 +381,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		Connection con = null;
 		
 		try {
-			logger.debug("Deleting [{}]", dn);
+			logger.debug("ldapDelete [{dn: {}", dn);
 			con = conFactory.getConnection();
 			con.open();
 			DeleteOperation opDelete = new DeleteOperation(con);
@@ -401,7 +399,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		Connection con = null;
 		
 		try {
-			logger.debug("Changing password [{}]", dn);
+			logger.debug("ldapChangePassword [{dn: {}", dn);
 			con = conFactory.getConnection();
 			con.open();
 			PasswordModifyOperation opPasswordModify = new PasswordModifyOperation(con);
@@ -427,10 +425,13 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		if(con != null) con.close();
 	}
 	
-	protected AuthenticationResponse ldapAuthenticate(ConnectionFactory conFactory, String userIdField, String baseDn, String extraFilter, String userId, char[] password, String[] returnAttributes) throws LdapException {
+	protected AuthenticationResponse ldapAuthenticate(ConnectionFactory conFactory, String userIdField, String baseDn, String extraFilter, boolean subtreeSearch, String userId, char[] password, String[] returnAttributes) throws LdapException {
 		SearchDnResolver dnResolver = new SearchDnResolver(conFactory);
 		dnResolver.setBaseDn(baseDn);
-		dnResolver.setUserFilter(joinFilters(userIdField + "={user}", extraFilter));
+		final String filter = joinFilters(userIdField + "={user}", extraFilter);
+		dnResolver.setUserFilter(filter);
+		dnResolver.setSubtreeSearch(subtreeSearch);
+		logger.debug("ldapAuthenticate [user: {}, baseDn: {}, filter: {}, subtree: {}]", userId, baseDn, filter, subtreeSearch);
 		Authenticator auth = new Authenticator(dnResolver, new BindAuthenticationHandler(conFactory));
 		return auth.authenticate(new AuthenticationRequest(userId, new Credential(password), returnAttributes));
 	}
@@ -445,6 +446,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	protected ConnectionFactory createConnectionFactory(DirectoryOptions opts, String dn, char[] password) {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		ConnectionSetup setup = setupConnection(builder.getHost(opts), builder.getPort(opts), builder.getConnectionSecurity(opts), dn, password);
+		logConnectionSetup(setup);
 		if (setup.provider != null) {
 			return new DefaultConnectionFactory(setup.connectionConfig, setup.provider);
 		} else {
@@ -452,38 +454,22 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 		}
 	}
 	
-	/*
-	protected ConnectionFactory createConnectionFactory(DirectoryOptions opts, String dn, char[] password) {
-		AbstractLdapConfigBuilder builder = getConfigBuilder();
-		JndiProvider jp = new JndiProvider();
-		ConnectionConfig config = createConnectionConfig(jp, builder.getHost(opts), builder.getPort(opts), builder.getConnectionSecurity(opts), dn, password);
-		return new DefaultConnectionFactory(config, jp);
-	}
-	
-	protected ConnectionConfig createConnectionConfig(JndiProvider jp, String host, int port, ConnectionSecurity security, String dn, char[] password) {
-		ConnectionConfig config = new ConnectionConfig("ldap://" + host + ":" + port);
-		
-		if (EnumUtils.equals(security, ConnectionSecurity.SSL)) {
-			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
-			config.setLdapUrl("ldaps://" + host + ":" + port);
-			config.setUseSSL(true);
-		} else if (EnumUtils.equals(security, ConnectionSecurity.STARTTLS)) {
-			jp.getProviderConfig().setHostnameVerifier(new AllowAnyHostnameVerifier());
-			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
-			config.setUseStartTLS(true);
+	protected void logConnectionSetup(ConnectionSetup setup) {
+		ConnectionInitializer ci = setup.connectionConfig.getConnectionInitializer();
+		if (ci instanceof BindConnectionInitializer) {
+			logger.debug("Setting-up LDAP connection [url: {}, bindDn: {}]", setup.connectionConfig.getLdapUrl(), ((BindConnectionInitializer)ci).getBindDn());
+		} else {
+			logger.debug("Setting-up LDAP connection [url: {}]", setup.connectionConfig.getLdapUrl());
 		}
-		if(!StringUtils.isBlank(dn) && (password != null)) {
-			config.setConnectionInitializer(new BindConnectionInitializer(dn, new Credential(password)));
-		}
-		return config;
 	}
-	*/
 	
 	protected ConnectionSetup setupConnection(String host, int port, ConnectionSecurity security, String dn, char[] password) {
 		ConnectionConfig config = new ConnectionConfig("ldap://" + host + ":" + port);
 		JndiProvider provider = null;
 		
 		if (EnumUtils.equals(security, ConnectionSecurity.SSL)) {
+			provider = new JndiProvider();
+			provider.getProviderConfig().setHostnameVerifier(new AllowAnyHostnameVerifier());
 			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
 			config.setLdapUrl("ldaps://" + host + ":" + port);
 			config.setUseSSL(true);

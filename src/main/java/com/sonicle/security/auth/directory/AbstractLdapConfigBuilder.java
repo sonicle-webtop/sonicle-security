@@ -33,6 +33,7 @@
  */
 package com.sonicle.security.auth.directory;
 
+import com.sonicle.commons.EnumUtils;
 import com.sonicle.security.ConnectionSecurity;
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,10 +45,12 @@ public abstract class AbstractLdapConfigBuilder extends AbstractConfigBuilder {
 	protected static final String PARAM_HOST = "host";
 	protected static final String PARAM_PORT = "port";
 	protected static final String PARAM_CON_SECURITY = "conSecurity";
+	protected static final String PARAM_VALIDATE_SSL = "validateSSL";
 	protected static final String PARAM_ADMIN_DN = "adminDn";
 	protected static final String PARAM_ADMIN_PASSWORD = "adminPassword";
 	protected static final String PARAM_LOGIN_DN = "loginDn"; // Base Dn for authentication
 	protected static final String PARAM_LOGIN_FILTER = "loginFilter"; // Filter to use during authentication
+	protected static final String PARAM_LOGIN_SUBTREE_SEARCH = "loginSubtreeSearch"; // True to allow subtree scanning, false otherwise
 	protected static final String PARAM_USER_DN = "userDn"; // Base Dn for operations on user
 	protected static final String PARAM_USER_FILTER = "userFilter"; // Filter to use during users listing
 	protected static final String PARAM_USER_ID_FIELD = "userIdField"; // Name of the id field (usually uid)
@@ -57,7 +60,10 @@ public abstract class AbstractLdapConfigBuilder extends AbstractConfigBuilder {
 	
 	public static final String DEFAULT_HOST = "localhost";
 	public static final Integer DEFAULT_PORT = 389;
+	public static final Integer DEFAULT_PORT_SECURE = 636;
+	public static final boolean DEFAULT_PARAM_VALIDATE_SSL = false;
 	public static final String DEFAULT_USER_ID_FIELD = "uid";
+	public static final boolean DEFAULT_LOGIN_SUBTREE_SEARCH = true;
 	
 	public String getHost(DirectoryOptions opts) {
 		return getString(opts, PARAM_HOST, DEFAULT_HOST);
@@ -68,7 +74,19 @@ public abstract class AbstractLdapConfigBuilder extends AbstractConfigBuilder {
 	}
 	
 	public int getPort(DirectoryOptions opts) {
-		return getInteger(opts, PARAM_PORT, DEFAULT_PORT);
+		Integer port = getInteger(opts, PARAM_PORT, null);
+		if (port != null) {
+			return port;
+		} else {
+			ConnectionSecurity security = getConnectionSecurity(opts);
+			if (EnumUtils.equals(security, ConnectionSecurity.SSL)) {
+				return DEFAULT_PORT_SECURE;
+			} else if (EnumUtils.equals(security, ConnectionSecurity.STARTTLS)) {
+				return DEFAULT_PORT;
+			} else {
+				return -1;
+			}
+		}
 	}
 	
 	public void setPort(DirectoryOptions opts, int port) {
@@ -99,6 +117,20 @@ public abstract class AbstractLdapConfigBuilder extends AbstractConfigBuilder {
 		setParam(opts, PARAM_ADMIN_PASSWORD, adminPassword);
 	}
 	
+	/*
+	public boolean getValidateSSLCertificate(DirectoryOptions opts) {
+		return getBoolean(opts, PARAM_VALIDATE_SSL, DEFAULT_PARAM_VALIDATE_SSL);
+	}
+	
+	public void setValidateSSLCertificate(DirectoryOptions opts, boolean validateSSLCertificate) {
+		setParam(opts, PARAM_VALIDATE_SSL, validateSSLCertificate);
+	}
+	*/
+	
+	public boolean isAdminAnonymous(DirectoryOptions opts) {
+		return StringUtils.isBlank(getAdminDn(opts));
+	}
+	
 	public String getLoginDn(DirectoryOptions opts) {
 		return getString(opts, PARAM_LOGIN_DN, null);
 	}
@@ -113,6 +145,14 @@ public abstract class AbstractLdapConfigBuilder extends AbstractConfigBuilder {
 	
 	public void setLoginFilter(DirectoryOptions opts, String loginFilter) {
 		setParam(opts, PARAM_LOGIN_FILTER, loginFilter);
+	}
+	
+	public boolean getLoginSubtreeSearch(DirectoryOptions opts) {
+		return getBoolean(opts, PARAM_LOGIN_SUBTREE_SEARCH, DEFAULT_LOGIN_SUBTREE_SEARCH);
+	}
+	
+	public void setLoginSubtreeSearch(DirectoryOptions opts, boolean loginSubtreeSearch) {
+		setParam(opts, PARAM_LOGIN_SUBTREE_SEARCH, loginSubtreeSearch);
 	}
 	
 	public String getUserDn(DirectoryOptions opts) {

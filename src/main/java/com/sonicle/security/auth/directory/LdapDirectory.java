@@ -72,7 +72,9 @@ public final class LdapDirectory extends AbstractLdapDirectory {
 	
 	@Override
 	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
-		int iport = (port == null) ? LdapConfigBuilder.DEFAULT_PORT : port;
+		int iport = (port == null) ? -1 : port;
 		return new URI(SCHEME, null, host, iport, path, null, null);
+		//int iport = (port == null) ? LdapConfigBuilder.DEFAULT_PORT : port;
+		//return new URI(SCHEME, null, host, iport, path, null, null);
 	}
 }

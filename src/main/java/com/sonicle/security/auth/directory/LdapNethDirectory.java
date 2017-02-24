@@ -75,11 +75,14 @@ public final class LdapNethDirectory extends AbstractLdapDirectory {
 	
 	@Override
 	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+		int iport = (port == null) ? -1 : port;
+		return new URI(SCHEME, null, host, iport, path, null, null);
 		// path can be ignored!
-		int iport = (port == null) ? LdapNethConfigBuilder.DEFAULT_PORT : port;
-		return new URI(SCHEME, null, host, iport, null, null, null);
+		//int iport = (port == null) ? LdapNethConfigBuilder.DEFAULT_PORT : port;
+		//return new URI(SCHEME, null, host, iport, null, null, null);
 	}
 	
+	/*
 	@Override
 	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
@@ -88,9 +91,10 @@ public final class LdapNethDirectory extends AbstractLdapDirectory {
 			final String userIdField = builder.getUserIdField(opts);
 			final String baseDn = builder.getLoginDn(opts);
 			final String extraFilter = builder.getLoginFilter(opts);
+			final boolean subtree = builder.getLoginSubtreeSearch(opts);
 			final String[] attrs = createUserReturnAttrs(opts);
 			ConnectionFactory conFactory = createConnectionFactory(opts, false);
-			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, extraFilter, principal.getUserId(), principal.getPassword(), attrs);
+			AuthenticationResponse authResp = ldapAuthenticate(conFactory, userIdField, baseDn, extraFilter, subtree, principal.getUserId(), principal.getPassword(), attrs);
 			if(!authResp.getResult()) throw new DirectoryException(authResp.getMessage());
 			
 			final String baseDn2 = builder.getLoginDn(opts);
@@ -124,4 +128,5 @@ public final class LdapNethDirectory extends AbstractLdapDirectory {
 		// Builds a filter string for searching specific user
 		return "(" + builder.getUserIdField(opts) + "=" + userIdValue + ")";
 	}
+	*/
 }
