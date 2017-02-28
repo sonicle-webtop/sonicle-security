@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<authenticators>
-	<authenticator schema="webtop" className="com.sonicle.security.WebTopAuthenticator" />
-	<authenticator schema="ldap"   className="com.sonicle.security.LdapAuthenticator" />
-	<authenticator schema="vfs"    className="com.sonicle.security.VfsAuthenticator" />
-	<authenticator schema="imap"   className="com.sonicle.security.ImapAuthenticator" />
-	<authenticator schema="imaps"  className="com.sonicle.security.ImapAuthenticator" />
-</authenticators>
