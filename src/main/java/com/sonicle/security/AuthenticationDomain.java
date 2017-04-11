@@ -43,15 +43,17 @@ public class AuthenticationDomain {
 	private String domainId;
 	private String internetName;
 	private URI dirUri;
+	private boolean dirCaseSensitive;
 	private String dirAdmin;
 	private char[] dirPassword;
 	private ConnectionSecurity dirConnSecurity;
 	private String dirParameters;
 	
-	public AuthenticationDomain(String domainId, String internetName, String dirUri, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity, String dirParameters) throws URISyntaxException {
+	public AuthenticationDomain(String domainId, String internetName, String dirUri, boolean dirCaseSensitive, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity, String dirParameters) throws URISyntaxException {
 		this.domainId = domainId;
 		this.internetName = internetName;
 		this.dirUri = new URI(dirUri);
+		this.dirCaseSensitive = dirCaseSensitive;
 		this.dirAdmin = dirAdmin;
 		this.dirPassword = dirPassword;
 		this.dirConnSecurity = authConSecurity;
@@ -68,6 +70,10 @@ public class AuthenticationDomain {
 
 	public URI getDirUri() {
 		return dirUri;
+	}
+	
+	public boolean getDirCaseSensitive() {
+		return dirCaseSensitive;
 	}
 
 	public String getDirAdmin() {

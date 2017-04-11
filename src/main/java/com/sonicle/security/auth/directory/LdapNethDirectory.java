@@ -32,19 +32,11 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.Principal;
-import com.sonicle.security.auth.DirectoryException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
-import org.ldaptive.ConnectionFactory;
-import org.ldaptive.LdapAttribute;
-import org.ldaptive.LdapEntry;
-import org.ldaptive.LdapException;
-import org.ldaptive.auth.AuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
