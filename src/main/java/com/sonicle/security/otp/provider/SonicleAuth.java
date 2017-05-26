@@ -32,22 +32,17 @@
  */
 package com.sonicle.security.otp.provider;
 
-import com.sonicle.security.otp.OTPException;
 import com.sonicle.security.otp.OTPKey;
 import com.sonicle.security.otp.OTPProviderBase;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *
  * @author matteo
  */
 public class SonicleAuth extends OTPProviderBase {
-	
 	public static final long DEFAULT_KEY_VALIDATION_INTERVAL = 60;
 
 	@Override
@@ -72,18 +67,8 @@ public class SonicleAuth extends OTPProviderBase {
 	}
 	
 	protected static int calculateCode(String base) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			md.reset();
-			String hash = base + String.valueOf(new Date().getTime());
-			byte[] bytes = md.digest(hash.getBytes());
-			BigInteger number = new BigInteger(1, bytes);
-			String code = number.toString(8);
-			return Integer.valueOf(StringUtils.rightPad(StringUtils.right(code, 6), 6, "0"));
-			
-		} catch (NoSuchAlgorithmException ex) {
-			throw new OTPException("The operation cannot be performed now.");
-		}	
+		String hash = DigestUtils.md5Hex(base + String.valueOf(new Date().getTime()));
+		return (int)(hash.hashCode() % 1e6);
 	}
 	
 	protected static boolean checkCode(int userCode, int code, long codeTimestamp, long validationInterval) {
