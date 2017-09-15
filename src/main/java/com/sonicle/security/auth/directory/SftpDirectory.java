@@ -33,7 +33,6 @@
 package com.sonicle.security.auth.directory;
 
 import com.jcraft.jsch.JSch;
-import com.sonicle.commons.URIBuilder;
 import com.sonicle.security.Principal;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
@@ -48,6 +47,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.VFS;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,8 +157,7 @@ public class SftpDirectory extends AbstractDirectory {
 			.setScheme(SCHEME)
 			.setHost(getConfigBuilder().getHost(opts))
 			.setPort(getConfigBuilder().getPort(opts))
-			.setUsername(principal.getUserId())
-			.setPassword(new String(principal.getPassword()))
+			.setUserInfo(principal.getUserId(), new String(principal.getPassword()))
 			.setPath("/")
 			.build();
 	}
