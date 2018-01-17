@@ -37,6 +37,7 @@ import com.sonicle.security.otp.OTPProviderBase;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  *
@@ -51,7 +52,7 @@ public class SonicleAuth extends OTPProviderBase {
 	}
 
 	public OTPKey generateCredentials() {
-		return generateCredentials("");
+		return generateCredentials("abcdefghilmnopqrstuvz");
 	}
 	
 	public OTPKey generateCredentials(String base) {
@@ -67,14 +68,15 @@ public class SonicleAuth extends OTPProviderBase {
 	}
 	
 	protected static int calculateCode(String base) {
-		String hash = DigestUtils.md5Hex(base + String.valueOf(new Date().getTime()));
-		return (int)(hash.hashCode() % 1e6);
+		return Integer.valueOf(RandomStringUtils.randomNumeric(6));
+		//String hash = DigestUtils.md5Hex(base + String.valueOf(new Date().getTime()));
+		//return Math.abs((int)(hash.hashCode() % 1e6));
 	}
 	
 	protected static boolean checkCode(int userCode, int code, long codeTimestamp, long validationInterval) {
 		long now = new Date().getTime();
 		long msInterval = TimeUnit.SECONDS.toMillis(validationInterval);
-		if((now - codeTimestamp) <= msInterval) {
+		if ((now - codeTimestamp) <= msInterval) {
 			return String.valueOf(userCode).equals(String.valueOf(code));
 		} else {
 			return false;

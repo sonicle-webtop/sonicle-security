@@ -40,16 +40,16 @@ public class OTPKey {
 	private final String key;
 	private final int verificationCode;
 	
-	public OTPKey(String secretKey, int code) {
+	public OTPKey(String secretKey, int verificationCode) {
 		this.key = secretKey;
-		this.verificationCode = code;
+		this.verificationCode = verificationCode;
 	}
 	
 	public String getKey() {
-		return this.key;
+		return key;
 	}
 	
 	public int getVerificationCode() {
-		return this.verificationCode;
+		return verificationCode;
 	}
 }
