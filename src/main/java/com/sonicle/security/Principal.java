@@ -140,6 +140,10 @@ public class Principal implements java.security.Principal, Serializable {
 		return password;
 	}
 	
+	public void setPassword(char[] password) {
+		this.password = password;
+	}
+	
 	/**
 	 * Sets the associated display name.
 	 * @param displayName The value of the name.
