@@ -81,14 +81,6 @@ public class Principal implements java.security.Principal, Serializable {
 		return impersonated;
 	}
 	
-	public static String buildHashedName(String name) {
-		return DigestUtils.md5Hex(name);
-	}
-	
-	public static String buildHashedName(String domainId, String userId) {
-		return buildHashedName(DomainAccount.buildName(domainId, userId));
-	}
-	
 	/**
 	 * Gets the identifier that uniquely identify a user.
 	 * This is a composite field: userId@domainId.
@@ -97,6 +89,28 @@ public class Principal implements java.security.Principal, Serializable {
 	@Override
 	public String getName() {
 		return name;
+	}
+	
+	/**
+	 * Gets the full name using the internet name as domain part.
+	 * This can return null in case of missing authenticationDomain.
+	 * @return The unique identifier.
+	 */
+	public String getFullInternetName() {
+		if (authenticationDomain == null) {
+			return null;
+		} else {
+			return DomainAccount.buildName(authenticationDomain.getInternetName(), userId);
+		}
+	}
+	
+	/**
+	 * Gets the full name that uniquely identify a user.
+	 * This call is an alias og getName().
+	 * @return The unique identifier.
+	 */
+	public String getFullName() {
+		return getName();
 	}
 	
 	/**
@@ -176,6 +190,14 @@ public class Principal implements java.security.Principal, Serializable {
 		return new EqualsBuilder()
 			.append(name, otherObject.name)
 			.isEquals();
+	}
+	
+	public static String buildHashedName(String name) {
+		return DigestUtils.md5Hex(name);
+	}
+	
+	public static String buildHashedName(String domainId, String userId) {
+		return buildHashedName(DomainAccount.buildName(domainId, userId));
 	}
 	
 	public static boolean xisAdmin(String name) {
