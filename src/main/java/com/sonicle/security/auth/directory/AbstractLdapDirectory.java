@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Sonicle S.r.l.
+ * Copyright (C) 2018 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,7 +28,7 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2014 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2018 Sonicle S.r.l.".
  */
 package com.sonicle.security.auth.directory;
 
@@ -72,7 +72,6 @@ import org.ldaptive.auth.BindAuthenticationHandler;
 import org.ldaptive.auth.SearchDnResolver;
 import org.ldaptive.extended.PasswordModifyOperation;
 import org.ldaptive.extended.PasswordModifyRequest;
-import org.ldaptive.provider.jndi.JndiProvider;
 import org.ldaptive.ssl.AllowAnyHostnameVerifier;
 import org.ldaptive.ssl.AllowAnyTrustManager;
 import org.ldaptive.ssl.SslConfig;
@@ -444,53 +443,38 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	
 	protected ConnectionFactory createConnectionFactory(DirectoryOptions opts, String dn, char[] password) {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
-		ConnectionSetup setup = setupConnection(builder.getHost(opts), builder.getPort(opts), builder.getConnectionSecurity(opts), dn, password);
-		logConnectionSetup(setup);
-		if (setup.provider != null) {
-			return new DefaultConnectionFactory(setup.connectionConfig, setup.provider);
-		} else {
-			return new DefaultConnectionFactory(setup.connectionConfig);
-		}
+		ConnectionConfig config = setupConnection(builder.getHost(opts), builder.getPort(opts), builder.getConnectionSecurity(opts), dn, password);
+		logConnectionConfig(config);
+		return new DefaultConnectionFactory(config);
 	}
 	
-	protected void logConnectionSetup(ConnectionSetup setup) {
-		ConnectionInitializer ci = setup.connectionConfig.getConnectionInitializer();
+	protected void logConnectionConfig(ConnectionConfig config) {
+		ConnectionInitializer ci = config.getConnectionInitializer();
 		if (ci instanceof BindConnectionInitializer) {
-			logger.debug("Setting-up LDAP connection [url: {}, bindDn: {}]", setup.connectionConfig.getLdapUrl(), ((BindConnectionInitializer)ci).getBindDn());
+			logger.debug("Setting-up LDAP connection [url: {}, bindDn: {}]", config.getLdapUrl(), ((BindConnectionInitializer)ci).getBindDn());
 		} else {
-			logger.debug("Setting-up LDAP connection [url: {}]", setup.connectionConfig.getLdapUrl());
+			logger.debug("Setting-up LDAP connection [url: {}]", config.getLdapUrl());
 		}
 	}
 	
-	protected ConnectionSetup setupConnection(String host, int port, ConnectionSecurity security, String dn, char[] password) {
+	protected ConnectionConfig setupConnection(String host, int port, ConnectionSecurity security, String dn, char[] password) {
 		ConnectionConfig config = new ConnectionConfig("ldap://" + host + ":" + port);
-		JndiProvider provider = null;
 		
 		if (EnumUtils.equals(security, ConnectionSecurity.SSL)) {
-			provider = new JndiProvider();
-			provider.getProviderConfig().setHostnameVerifier(new AllowAnyHostnameVerifier());
-			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
+			SslConfig sslConfig = new SslConfig(new AllowAnyTrustManager());
+			sslConfig.setHostnameVerifier(new AllowAnyHostnameVerifier());
+			config.setSslConfig(sslConfig);
 			config.setLdapUrl("ldaps://" + host + ":" + port);
 			config.setUseSSL(true);
 		} else if (EnumUtils.equals(security, ConnectionSecurity.STARTTLS)) {
-			provider = new JndiProvider();
-			provider.getProviderConfig().setHostnameVerifier(new AllowAnyHostnameVerifier());
-			config.setSslConfig(new SslConfig(new AllowAnyTrustManager()));
+			SslConfig sslConfig = new SslConfig(new AllowAnyTrustManager());
+			sslConfig.setHostnameVerifier(new AllowAnyHostnameVerifier());
+			config.setSslConfig(sslConfig);
 			config.setUseStartTLS(true);
 		}
 		if(!StringUtils.isBlank(dn) && (password != null)) {
 			config.setConnectionInitializer(new BindConnectionInitializer(dn, new Credential(password)));
 		}
-		return new ConnectionSetup(config, provider);
-	}
-	
-	protected static class ConnectionSetup {
-		public ConnectionConfig connectionConfig;
-		public JndiProvider provider;
-		
-		public ConnectionSetup(ConnectionConfig connectionConfig, JndiProvider provider) {
-			this.connectionConfig = connectionConfig;
-			this.provider = provider;
-		}
+		return config;
 	}
 }
