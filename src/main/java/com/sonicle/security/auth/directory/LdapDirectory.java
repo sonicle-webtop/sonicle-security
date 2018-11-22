@@ -58,6 +58,11 @@ public final class LdapDirectory extends AbstractLdapDirectory {
 			DirectoryCapability.USERS_WRITE
 		)
 	);
+	
+	@Override
+	public String getScheme() {
+		return SCHEME;
+	}
 
 	@Override
 	public LdapConfigBuilder getConfigBuilder() {

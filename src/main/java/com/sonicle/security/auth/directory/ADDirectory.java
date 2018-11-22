@@ -61,6 +61,11 @@ public class ADDirectory extends AbstractLdapDirectory {
 	);
 	
 	@Override
+	public String getScheme() {
+		return SCHEME;
+	}
+	
+	@Override
 	public Collection<DirectoryCapability> getCapabilities() {
 		return CAPABILITIES;
 	}

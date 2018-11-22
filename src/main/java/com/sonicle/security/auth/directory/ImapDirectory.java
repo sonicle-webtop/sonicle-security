@@ -62,6 +62,11 @@ public class ImapDirectory extends AbstractDirectory {
 	static final Collection<DirectoryCapability> CAPABILITIES = Collections.EMPTY_LIST;
 	
 	@Override
+	public String getScheme() {
+		return SCHEME;
+	}
+	
+	@Override
 	public Collection<DirectoryCapability> getCapabilities() {
 		return CAPABILITIES;
 	}

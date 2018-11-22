@@ -47,6 +47,7 @@ import java.util.List;
  */
 public interface Directory {
 	
+	public abstract String getScheme();
 	Collection<DirectoryCapability> getCapabilities();
 	public abstract <T extends AbstractConfigBuilder> T getConfigBuilder();
 	public abstract URI buildUri(String host, Integer port, String path) throws URISyntaxException;

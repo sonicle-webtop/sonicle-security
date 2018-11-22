@@ -59,6 +59,11 @@ public class SmbDirectory extends AbstractDirectory {
 	public static final String SCHEME = "smb";
 	
 	static final Collection<DirectoryCapability> CAPABILITIES = Collections.EMPTY_LIST;
+
+	@Override
+	public String getScheme() {
+		return SCHEME;
+	}
 	
 	@Override
 	public Collection<DirectoryCapability> getCapabilities() {

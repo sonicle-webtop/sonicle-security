@@ -60,6 +60,11 @@ public final class LdapNethDirectory extends AbstractLdapDirectory {
 	}
 	
 	@Override
+	public String getScheme() {
+		return SCHEME;
+	}
+	
+	@Override
 	public Collection<DirectoryCapability> getCapabilities() {
 		return CAPABILITIES;
 	}
