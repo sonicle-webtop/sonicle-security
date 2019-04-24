@@ -32,6 +32,7 @@
  */
 package com.sonicle.security;
 
+import com.sonicle.security.auth.directory.AbstractDirectory;
 import java.io.Serializable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,7 @@ public class Principal implements java.security.Principal, Serializable {
 	private String userId = null;
 	private char[] password = null;
 	private String displayName = null;
+	private AbstractDirectory.AuthUser directoryEntry = null;
 	
 	public Principal(AuthenticationDomain ad, boolean impersonated, String domainId, String userId, char[] password) {
 		this.authenticationDomain = ad;
@@ -168,6 +170,24 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	public String getHashedName() {
 		return this.hashedName;
+	}
+	
+	/**
+	 * Returns and clear any authentication result object previously set.
+	 * @return 
+	 */
+	public AbstractDirectory.AuthUser popDirectoryEntry() {
+		AbstractDirectory.AuthUser de = this.directoryEntry;
+		this.directoryEntry = null;
+		return de;
+	}
+	
+	/**
+	 * Saves directory authentication result for later.
+	 * @param directoryEntry The data object.
+	 */
+	public void pushDirectoryEntry(AbstractDirectory.AuthUser directoryEntry) {
+		this.directoryEntry = directoryEntry;
 	}
 	
 	@Override
