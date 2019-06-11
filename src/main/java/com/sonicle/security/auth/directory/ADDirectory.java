@@ -83,6 +83,11 @@ public class ADDirectory extends AbstractLdapDirectory {
 		//return new URI(SCHEME, null, host, iport, path, null, null);
 	}
 	
+	@Override
+	public boolean validateUsername(DirectoryOptions opts, String username) {
+		return true;
+	}
+	
 	/*
 	@Override
 	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
