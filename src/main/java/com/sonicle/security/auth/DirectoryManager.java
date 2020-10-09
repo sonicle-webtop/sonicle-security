@@ -36,14 +36,18 @@ import com.sonicle.commons.LangUtils;
 import com.sonicle.security.auth.directory.AbstractDirectory;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +63,7 @@ public class DirectoryManager {
 	private final HashMap<String, AbstractDirectory> directories = new HashMap<>();
 	
 	public static synchronized DirectoryManager getManager() {
-		if(instance == null) instance = new DirectoryManager();
+		if (instance == null) instance = new DirectoryManager();
 		return instance;
 	}
 	
@@ -75,22 +79,22 @@ public class DirectoryManager {
 		}
 		
 		// Initialize configurations
-		while(enumResources.hasMoreElements()) {
+		while (enumResources.hasMoreElements()) {
 			URL url = enumResources.nextElement();
 			try {
-				for(DirectoryConfig config : parseConfig(url)) {
+				for (DirectoryConfig config : parseConfig(url)) {
 					try {
 						Class clazz = loadClass(config.className, AbstractDirectory.class);
-						if(clazz != null) {
+						if (clazz != null) {
 							final AbstractDirectory dirInstance = (AbstractDirectory)clazz.newInstance();
 							directories.put(config.scheme, dirInstance);
 							logger.info("Directory registered [{}]", config.className);
 						}
-					} catch(InstantiationException | IllegalAccessException ex1) {
+					} catch (InstantiationException | IllegalAccessException ex1) {
 						logger.error("Directory instantiation failure [{}]", config.className, ex1);
 					}
 				}
-			} catch(ConfigurationException ex) {
+			} catch (ConfigurationException ex) {
 				logger.error("Error while reading configuration [{}]", url.toString(), ex);
 			}
 		}
@@ -100,15 +104,22 @@ public class DirectoryManager {
 		return directories.get(scheme);
 	}
 	
-	private ArrayList<DirectoryConfig> parseConfig(final URL uri) throws ConfigurationException {
+	private ArrayList<DirectoryConfig> parseConfig(final URL uri) throws ConfigurationException {				
+		FileBasedConfigurationBuilder<XMLConfiguration> builder = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
+			.configure(new Parameters()
+				.xml()
+				.setEncoding(StandardCharsets.UTF_8.name())
+				.setURL(uri)
+			);
+		XMLConfiguration config = builder.getConfiguration();
+		
 		ArrayList<DirectoryConfig> configs = new ArrayList();
-		XMLConfiguration config = new XMLConfiguration(uri);
-		List<HierarchicalConfiguration> elDirectories = config.configurationsAt("authDirectory");
-		for(HierarchicalConfiguration elDirectory : elDirectories) {
+		List<HierarchicalConfiguration<ImmutableNode>> elDirectories = config.configurationsAt("authDirectory");
+		for (HierarchicalConfiguration<ImmutableNode> elDirectory : elDirectories) {
 			String scheme = elDirectory.getString("[@scheme]");
-			if(StringUtils.isBlank(scheme)) throw new ConfigurationException("Missing attribute [scheme]");
+			if (StringUtils.isBlank(scheme)) throw new ConfigurationException("Missing attribute [scheme]");
 			String className = elDirectory.getString("[@class-name]");
-			if(StringUtils.isBlank(className)) throw new ConfigurationException("Missing attribute [class-name]");
+			if (StringUtils.isBlank(className)) throw new ConfigurationException("Missing attribute [class-name]");
 			
 			configs.add(new DirectoryConfig(scheme, className));
 		}
@@ -120,14 +131,14 @@ public class DirectoryManager {
 		Class clazz = null;
 		try {
 			clazz = Class.forName(className);
-			if(!absClass.isAssignableFrom(clazz)) throw new ClassCastException();
+			if (!absClass.isAssignableFrom(clazz)) throw new ClassCastException();
 			return clazz;
 
-		} catch(ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			logger.debug("Class not found [{}]", className);
-		} catch(ClassCastException ex) {
+		} catch (ClassCastException ex) {
 			logger.warn("Class must extends '{}' class", absClass.toString());
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			logger.error("Unable to load class [{}]", className, t);
 		}
 		return null;
