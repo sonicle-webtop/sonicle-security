@@ -21,7 +21,7 @@
 		<!-- DEP: widely used libs -->
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<commons-codec.version>1.9</commons-codec.version>
-		<commons-configuration2.version>2.4</commons-configuration2.version>
+		<commons-configuration2.version>2.7</commons-configuration2.version>
 		<commons-lang3.version>3.3.2</commons-lang3.version>
 		<commons-vfs2.version>2.2</commons-vfs2.version>
 		<javax-mail.version>1.5.6</javax-mail.version>
