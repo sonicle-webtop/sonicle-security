@@ -32,24 +32,36 @@
  */
 package com.sonicle.security.otp;
 
+import java.util.Date;
+
 /**
  *
  * @author malbinola
  */
 public class OTPKey {
-	private final String key;
-	private final int verificationCode;
+	private final String secretKey;
+	private final String verificationCode;
+	private final long verificationCodeTimestamp;
 	
-	public OTPKey(String secretKey, int verificationCode) {
-		this.key = secretKey;
+	public OTPKey(String secretKey, String verificationCode) {
+		this(secretKey, verificationCode, new Date().getTime());
+	}
+	
+	public OTPKey(String secretKey, String verificationCode, long verificationCodeTimestamp) {
+		this.secretKey = secretKey;
 		this.verificationCode = verificationCode;
+		this.verificationCodeTimestamp = verificationCodeTimestamp;
 	}
 	
-	public String getKey() {
-		return key;
+	public String getSecretKey() {
+		return secretKey;
 	}
 	
-	public int getVerificationCode() {
+	public String getVerificationCode() {
 		return verificationCode;
+	}
+	
+	public long getVerificationCodeTimestamp() {
+		return verificationCodeTimestamp;
 	}
 }

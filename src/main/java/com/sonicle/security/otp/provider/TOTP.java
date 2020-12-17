@@ -83,6 +83,7 @@ public class TOTP extends OTPProviderBase {
 		this.secureRandom = new ReseedingSecureRandom(RANDOM_NUMBER_ALGORITHM, RANDOM_NUMBER_ALGORITHM_PROVIDER);
 	}
 
+	@Override
 	public String getName() {
 		return "TOTP";
 	}
@@ -98,18 +99,20 @@ public class TOTP extends OTPProviderBase {
 		// Generating the verification code at time = 0
 		int validationCode = calculateValidationCode(secretKey);
 		
-		return new OTPKey(generatedKey, validationCode);
+		return new OTPKey(generatedKey, String.valueOf(validationCode));
 	}
 	
-	public boolean check(int userCode, String secret) {
+	public boolean check(String userCode, String secret) {
 		return check(userCode, secret, getWindowSize());
 	}
 	
-	public boolean check(int userCode, String secret, int window) {
-		if(userCode <= 0 || userCode >= DEFAULT_SECRET_KEY_MODULE) return false;
-		if(secret == null) throw new OTPException("Secret cannot be null.");
-		if(window < MIN_WINDOW || window > MAX_WINDOW) throw new OTPException("Invalid window size.");
-		return checkCode(getAlgorithm(), secret, userCode, new Date().getTime(), window, getKeyValidationInterval());
+	public boolean check(String userCode, String secret, int window) {
+		if (userCode == null) return false;
+		int iUserCode = Integer.parseInt(userCode);
+		if (iUserCode <= 0 || iUserCode >= DEFAULT_SECRET_KEY_MODULE) return false;
+		if (secret == null) throw new OTPException("Secret cannot be null.");
+		if (window < MIN_WINDOW || window > MAX_WINDOW) throw new OTPException("Invalid window size.");
+		return checkCode(getAlgorithm(), secret, iUserCode, new Date().getTime(), window, getKeyValidationInterval());
 	}
 	
 	protected static boolean checkCode(String algorithm, String secret, long code, long tm, int window, long validationInterval) {
@@ -127,7 +130,7 @@ public class TOTP extends OTPProviderBase {
 			// Calculating the verification code for the current time interval
 			long hash = calculateCode(algorithm, decodedKey, timeWindow + i);
 			// Checking if the provided code is equal to the calculated one
-			if(hash == code) return true;
+			if (hash == code) return true;
 		}
 		return false;
 	}	
@@ -233,7 +236,7 @@ public class TOTP extends OTPProviderBase {
 		if (value >= MIN_WINDOW && value <= MAX_WINDOW) {
 			this.windowSize = new AtomicInteger(value);
 		} else {
-			throw new OTPException(MessageFormat.format("Invalid window size [{}]", value));
+			throw new OTPException(MessageFormat.format("Invalid window size [{0}]", value));
 		}
 	}
 }

@@ -32,11 +32,9 @@
  */
 package com.sonicle.security.otp.provider;
 
-import com.sonicle.security.otp.OTPException;
 import com.sonicle.security.otp.OTPKey;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,16 +42,13 @@ import java.util.List;
  * @author matteo
  */
 public class GoogleAuth extends TOTP {
-	
 	private static final int DEFAULT_SCRATCH_CODES = 5;
 	private static final int DEFAULT_SCRATCH_CODE_LENGTH = 8;
 	private static final int DEFAULT_BYTES_PER_SCRATCH_CODE = 4;
 	public static final int DEFAULT_SCRATCH_CODE_MODULUS = (int) Math.pow(10, DEFAULT_SCRATCH_CODE_LENGTH);
 	private static final int SCRATCH_CODE_INVALID = -1;
 	
-	public GoogleAuth() {
-		
-	}
+	public GoogleAuth() {}
 	
 	@Override
 	public String getName() {
@@ -66,17 +61,17 @@ public class GoogleAuth extends TOTP {
 		this.secureRandom.nextBytes(buffer);
 		
 		// Extracting the bytes making up the secret key
-		byte[] secretKey = Arrays.copyOf(buffer, getSecretBits()/8);
-		String generatedKey = calculateSecretKey(secretKey);
+		byte[] secretKeyBytes = Arrays.copyOf(buffer, getSecretBits()/8);
+		String secretKey = calculateSecretKey(secretKeyBytes);
 		
-		int validationCode = calculateValidationCode(secretKey);
-		List<Integer> scratchCodes = calculateScratchCodes(buffer);
+		int validationCode = calculateValidationCode(secretKeyBytes);
+		List<String> scratchCodes = calculateScratchCodes(buffer);
 		
-		return new GoogleAuthOTPKey(generatedKey, validationCode, scratchCodes);
+		return new GoogleAuthOTPKey(secretKey, String.valueOf(validationCode), scratchCodes);
 	}
 	
-	private List<Integer> calculateScratchCodes(byte[] buffer) {
-		List<Integer> scratchCodes = new ArrayList<Integer>();
+	private List<String> calculateScratchCodes(byte[] buffer) {
+		List<String> scratchCodes = new ArrayList<>();
 		
 		while (scratchCodes.size() < DEFAULT_SCRATCH_CODES) {
 			byte[] scratchCodeBuffer = Arrays.copyOfRange(
@@ -85,10 +80,10 @@ public class GoogleAuth extends TOTP {
 				getSecretBits()/8 + DEFAULT_BYTES_PER_SCRATCH_CODE * scratchCodes.size() + DEFAULT_BYTES_PER_SCRATCH_CODE);
 			
 			int scratchCode = calculateScratchCode(scratchCodeBuffer);
-			if(scratchCode != SCRATCH_CODE_INVALID) {
-				scratchCodes.add(scratchCode);
+			if (scratchCode != SCRATCH_CODE_INVALID) {
+				scratchCodes.add(String.valueOf(scratchCode));
 			} else {
-				scratchCodes.add(generateScratchCode());
+				scratchCodes.add(String.valueOf(generateScratchCode()));
 			}
 		}
 		return scratchCodes;

@@ -35,6 +35,7 @@ package com.sonicle.security.otp.provider;
 import com.sonicle.security.otp.OTPKey;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,14 +46,14 @@ public class GoogleAuthOTPKey extends OTPKey {
 	private static final String QR_URL_FORMAT = "https://www.google.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl={0}";
 	public static final String AUTHENTICATOR_URI_FORMAT = "otpauth://totp/{0}?secret={1}&issuer={2}";
 	
-	private final List<Integer> scratchCodes;
+	private final List<String> scratchCodes;
 	
-	public GoogleAuthOTPKey(String secretKey, int code, List<Integer> scratchCodes) {
+	public GoogleAuthOTPKey(String secretKey, String code, Collection<String> scratchCodes) {
 		super(secretKey, code);
 		this.scratchCodes = new ArrayList<>(scratchCodes);
 	}
 	
-	public List<Integer> getScratchCodes() {
+	public List<String> getScratchCodes() {
 		return this.scratchCodes;
 	}
 	

@@ -32,12 +32,13 @@
  */
 package com.sonicle.security.otp.provider;
 
+import com.sonicle.commons.IdentifierUtils;
 import com.sonicle.security.otp.OTPKey;
 import com.sonicle.security.otp.OTPProviderBase;
 import java.util.Date;
+import java.util.SplittableRandom;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -50,34 +51,34 @@ public class SonicleAuth extends OTPProviderBase {
 	public String getName() {
 		return "TimeExpire";
 	}
-
+	
 	public OTPKey generateCredentials() {
-		return generateCredentials("abcdefghilmnopqrstuvz");
+		return new OTPKey(IdentifierUtils.getRandomAlphaNumericString(16), calculateCode(6));
 	}
 	
-	public OTPKey generateCredentials(String base) {
-		return new OTPKey(String.valueOf(new Date().getTime()), calculateCode(base));
-	}
-	
-	public boolean check(int userCode, int code, long codeTimestamp) {
+	public boolean check(String userCode, String code, long codeTimestamp) {
 		return checkCode(userCode, code, codeTimestamp, DEFAULT_KEY_VALIDATION_INTERVAL);
 	}
 	
-	public boolean check(int userCode, int code, long codeTimestamp, long validationInterval) {
+	public boolean check(String userCode, String code, long codeTimestamp, long validationInterval) {
 		return checkCode(userCode, code, codeTimestamp, validationInterval);
 	}
 	
-	protected static int calculateCode(String base) {
-		return Integer.valueOf(RandomStringUtils.randomNumeric(6));
-		//String hash = DigestUtils.md5Hex(base + String.valueOf(new Date().getTime()));
-		//return Math.abs((int)(hash.hashCode() % 1e6));
+	protected static String calculateCode(int length) {
+		StringBuilder sb = new StringBuilder();
+		SplittableRandom splittableRandom = new SplittableRandom();
+		for (int i=0; i < length; i++) {
+			sb.append(splittableRandom.nextInt(0, 9));
+		}
+		return sb.toString();
 	}
 	
-	protected static boolean checkCode(int userCode, int code, long codeTimestamp, long validationInterval) {
+	protected static boolean checkCode(String userCode, String code, long codeTimestamp, long validationInterval) {
+		if (userCode == null || code == null) return false;
 		long now = new Date().getTime();
 		long msInterval = TimeUnit.SECONDS.toMillis(validationInterval);
 		if ((now - codeTimestamp) <= msInterval) {
-			return String.valueOf(userCode).equals(String.valueOf(code));
+			return StringUtils.equals(userCode, code);
 		} else {
 			return false;
 		}
