@@ -45,7 +45,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author matteo
  */
 public class SonicleAuth extends OTPProviderBase {
-	public static final long DEFAULT_KEY_VALIDATION_INTERVAL = 60;
+	public static final int DEFAULT_KEY_VALIDATION_INTERVAL = 120;
 
 	@Override
 	public String getName() {
