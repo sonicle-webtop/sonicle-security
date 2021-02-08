@@ -50,7 +50,7 @@ public abstract class AbstractDirectory implements Directory {
 	}
 	
 	@Override
-	public char[] generatePassword(DirectoryOptions opts, boolean passwordPolicy) {
+	public char[] generatePassword(DirectoryOptions opts) {
 		return PasswordUtils.generatePassword(8, 8, 1, 1, 1, 1);
 	}
 	

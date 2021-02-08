@@ -53,8 +53,8 @@ public interface Directory {
 	public abstract URI buildUri(String host, Integer port, String path) throws URISyntaxException;
 	public abstract String sanitizeUsername(DirectoryOptions opts, String username);
 	public abstract boolean validateUsername(DirectoryOptions opts, String username);
-	public abstract boolean validatePasswordPolicy(DirectoryOptions opts, char[] password);
-	public abstract char[] generatePassword(DirectoryOptions opts, boolean passwordPolicy);
+	public abstract int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password);
+	public abstract char[] generatePassword(DirectoryOptions opts);
 	public abstract AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
 	public abstract List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException;
 	public abstract void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException;

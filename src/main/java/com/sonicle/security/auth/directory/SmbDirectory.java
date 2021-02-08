@@ -94,8 +94,8 @@ public class SmbDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public boolean validatePasswordPolicy(DirectoryOptions opts, char[] password) {
-		return true;
+	public int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password) {
+		return 0;
 	}
 
 	@Override

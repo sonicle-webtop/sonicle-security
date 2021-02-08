@@ -38,7 +38,7 @@ import java.text.MessageFormat;
  *
  * @author malbinola
  */
-public class EntryException extends DirectoryException{
+public class EntryException extends DirectoryException {
 	
 	public EntryException() {
 		super();

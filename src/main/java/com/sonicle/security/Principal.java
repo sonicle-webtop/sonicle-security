@@ -220,8 +220,12 @@ public class Principal implements java.security.Principal, Serializable {
 		return buildHashedName(DomainAccount.buildName(domainId, userId));
 	}
 	
-	public static boolean xisAdmin(String name) {
-		return StringUtils.equals(name, "admin@*");
+	public static boolean xisAdminDomain(String domainId) {
+		return StringUtils.equals(domainId, "*");
+	}
+	
+	public static boolean xisAdmin(String profileId) {
+		return StringUtils.equals(profileId, "admin@*");
 	}
 	
 	public static boolean xisAdmin(String domainId, String userId) {
