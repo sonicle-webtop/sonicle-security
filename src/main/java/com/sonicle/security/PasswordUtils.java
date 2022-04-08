@@ -46,9 +46,11 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -143,6 +145,10 @@ public class PasswordUtils {
 	}
 	*/
 	
+	/**
+	 * @deprecated this method should be avoided since that it NOT uses a random IV
+	 */
+	@Deprecated
 	public static String encryptDES(String string, String key) {
 		try {
 			DESKeySpec ks = new DESKeySpec(key.getBytes("UTF-8"));
@@ -158,6 +164,10 @@ public class PasswordUtils {
 		}
 	}
 	
+	/**
+	 * @deprecated this method should be avoided since that it NOT uses a random IV
+	 */
+	@Deprecated
 	public static String decryptDES(String encString, String key) {
 		try {
 			DESKeySpec ks = new DESKeySpec(key.getBytes("UTF-8"));
@@ -173,5 +183,32 @@ public class PasswordUtils {
 			//logger.error("Unable to decrypt", ex);
 			return null;
 		}
+	}
+	
+	/**
+	 * Redacts passed password using '*' character.
+	 * @param s The password to redact.
+	 * @return A String array with the redacted String and the computed MD5 hash of the original password.
+	 */
+	public static String[] redact(final String s) {
+		return redact(s, "*");
+	}
+	
+	/**
+	 * Redacts passed password using specified replacement characted.
+	 * @param s The password to redact.
+	 * @param redactChar The replacement String, should be 1 chararter length.
+	 * @return A String array with the redacted String and the computed MD5 hash of the original password.
+	 */
+	public static String[] redact(final String s, final String redactChar) {
+		Check.notNull(redactChar, "redactChar");
+		String redacted = null;
+		String hash = null;
+		
+		if (!StringUtils.isEmpty(s)) {
+			redacted = StringUtils.repeat(redactChar, s.length());
+			hash = DigestUtils.md5Hex(s);
+		}
+		return new String[]{redacted, hash};
 	}
 }
