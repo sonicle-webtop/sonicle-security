@@ -138,21 +138,35 @@ public class CryptoUtils {
 			SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 			return decrypt(s, "AES/CBC/PKCS5Padding", secretKeySpec, true);
 			
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+		} catch (IllegalArgumentException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
 			LOGGER.error("AES decrypt failed", ex);
 			return null;
 		}
 	}
 	
 	/**
-	 * Generates a secretKey suitable for AES from a random number.
+	 * Generates a secretKey suitable for AES from a generated random number.
+	 * Random meterial will be generated using "default" RNG algorithm.
 	 * @param keysize Length of the key in bits: 128, 192 or 256.
 	 * @return The generated key
-	 * @throws NoSuchAlgorithmException		
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public static SecretKey generateAESKey(int keysize) throws NoSuchAlgorithmException {
+	public static SecretKey generateAESKey(final int keysize) throws NoSuchAlgorithmException {
+		return generateAESKey(keysize, false);
+	}
+	
+	/**
+	 * Generates a secretKey suitable for AES from a generated random number.
+	 * Note that using a "strong" algorithm may be slow on certain systems (especially on some Linux).
+	 * https://tersesystems.com/blog/2015/12/17/the-right-way-to-use-securerandom/
+	 * @param keysize Length of the key in bits: 128, 192 or 256.
+	 * @param strongRandom Set to `true` to generate the random material using a "strong" algorithm (as indicated by {@code securerandom.strongAlgorithms} property), otherwise the "default" algorithm will be used.
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException	
+	 */
+	public static SecretKey generateAESKey(final int keysize, final boolean strongRandom) throws NoSuchAlgorithmException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-		keyGen.init(keysize, SecureRandom.getInstanceStrong());
+		keyGen.init(keysize, strongRandom ? SecureRandom.getInstanceStrong() : new SecureRandom());
 		return keyGen.generateKey();
 	}
 	
@@ -232,6 +246,7 @@ public class CryptoUtils {
 	 * @param key The secret key to use.
 	 * @param combinedIV Specified if IV is combined within encrypted data, `false` to not use IV.
 	 * @return The decrypted String
+	 * @throws IllegalArgumentException if base64 decode fails
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
@@ -239,7 +254,7 @@ public class CryptoUtils {
 	 * @throws IllegalBlockSizeException
 	 * @throws BadPaddingException 
 	 */
-	public static String decrypt(final String s, final String algorithm, final SecretKey key, final boolean combinedIV) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static String decrypt(final String s, final String algorithm, final SecretKey key, final boolean combinedIV) throws IllegalArgumentException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		Check.notNull(algorithm, "algorithm");
 		Check.notNull(key, "key");
 		if (StringUtils.isBlank(s)) return s;
