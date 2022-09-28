@@ -43,46 +43,51 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author malbinola
  */
 public class DomainAccount {
-	private String domain;
-	private String user;
+	private final String domain;
+	private final String local;
 	
-	public DomainAccount() {
-		this.domain = "";
-		this.user = "";
+	/**
+	 * @deprecated Use buildFullName instead
+	 */
+	@Deprecated
+	public static String buildName(String domain, String user) {
+		return user + "@" + domain;
+	}
+	
+	/**
+	 * @deprecated Use getLocal instead
+	 */
+	@Deprecated
+	public String getUser() {
+		return local;
+	}
+	
+	/**
+	 * @deprecated Use toString instead
+	 */
+	@Deprecated
+	public String getName() {
+		return DomainAccount.buildName(domain, local);
 	}
 
-	public DomainAccount(String accountName) {
+	public DomainAccount(final String accountName) {
 		int at = StringUtils.lastIndexOf(accountName, "@");
 		if(at == -1) throw new UnsupportedOperationException(MessageFormat.format("Unable to parse specified account name {0}", accountName));
 		this.domain = StringUtils.substring(accountName, at+1);
-		this.user = StringUtils.substring(accountName, 0, at);
+		this.local = StringUtils.substring(accountName, 0, at);
 	}
 
-	public DomainAccount(String domain, String user) {
+	public DomainAccount(final String domain, final String local) {
 		this.domain = Check.notNull(domain);
-		this.user = Check.notNull(user);
-	}
-	
-	public String getName() {
-		return DomainAccount.buildName(domain, user);
+		this.local = Check.notNull(local);
 	}
 
 	public String getDomain() {
 		return domain;
 	}
 	
-	public DomainAccount setDomain(String value) {
-		domain = Check.notNull(value);
-		return this;
-	}
-
-	public String getUser() {
-		return user;
-	}
-	
-	public DomainAccount setUser(String value) {
-		user = Check.notNull(value);
-		return this;
+	public String getLocal() {
+		return local;
 	}
 	
 	public boolean hasDomain(String domain) {
@@ -91,14 +96,14 @@ public class DomainAccount {
 
 	@Override
 	public String toString() {
-		return buildName(domain, user);
+		return buildFullName(domain, local);
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
 			.append(domain)
-			.append(user)
+			.append(local)
 			.toHashCode();
 	}
 
@@ -109,11 +114,11 @@ public class DomainAccount {
 		final DomainAccount otherObject = (DomainAccount) obj;
 		return new EqualsBuilder()
 			.append(domain, otherObject.domain)
-			.append(user, otherObject.user)
+			.append(local, otherObject.local)
 			.isEquals();
 	}
 	
-	public static String buildName(String domain, String user) {
-		return user + "@" + domain;
+	public static String buildFullName(final String domain, final String local) {
+		return Check.notNull(local, "local") + "@" + Check.notNull(domain, "domain");
 	}
 }
