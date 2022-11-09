@@ -186,6 +186,18 @@ public class PasswordUtils {
 	}
 	
 	/**
+	 * Prints the "redacted text" (three asterisk followed by a "(redated)") 
+	 * suitable for using in all situations where you do not want to output the 
+	 * secret as is, for eg. in logs. It will return `null` if the source 
+	 * secret is `null` too.
+	 * @param s
+	 * @return 
+	 */
+	public static String printRedacted(final String s) {
+		return (s == null) ? null : "***(redacted)";
+	}
+	
+	/**
 	 * Redacts passed password using '*' character.
 	 * @param s The password to redact.
 	 * @return A String array with the redacted String and the computed MD5 hash of the original password.
