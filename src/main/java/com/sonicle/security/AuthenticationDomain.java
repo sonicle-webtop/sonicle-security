@@ -50,9 +50,13 @@ public class AuthenticationDomain {
 	private String dirParameters;
 	
 	public AuthenticationDomain(String domainId, String internetName, String dirUri, boolean dirCaseSensitive, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity, String dirParameters) throws URISyntaxException {
+		this(domainId, internetName, new URI(dirUri), dirCaseSensitive, dirAdmin, dirPassword, authConSecurity, dirParameters);
+	}
+	
+	public AuthenticationDomain(String domainId, String internetName, URI dirUri, boolean dirCaseSensitive, String dirAdmin, char[] dirPassword, ConnectionSecurity authConSecurity, String dirParameters) {
 		this.domainId = domainId;
 		this.internetName = internetName;
-		this.dirUri = new URI(dirUri);
+		this.dirUri = dirUri;
 		this.dirCaseSensitive = dirCaseSensitive;
 		this.dirAdmin = dirAdmin;
 		this.dirPassword = dirPassword;
