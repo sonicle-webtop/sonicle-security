@@ -32,13 +32,11 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.commons.RegexUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +47,6 @@ import org.slf4j.LoggerFactory;
 public final class LdapDirectory extends AbstractLdapDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapDirectory.class);
 	public static final String SCHEME = "ldap";
-	public static final Pattern PATTERN_USERNAME = Pattern.compile("^" + RegexUtils.MATCH_USERNAME + "$");
 	
 	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
 		EnumSet.of(

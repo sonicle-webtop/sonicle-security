@@ -84,7 +84,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapDirectory.class);
-	public static final Pattern PATTERN_USERNAME = Pattern.compile("^" + RegexUtils.MATCH_USERNAME + "$");
+	public static final Pattern PATTERN_USERNAME = Pattern.compile("^" + RegexUtils.MATCH_USERNAME_CHARS + "$");
 	
 	@Override
 	public String sanitizeUsername(DirectoryOptions opts, String username) {
