@@ -32,6 +32,8 @@
  */
 package com.sonicle.security;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -53,6 +55,12 @@ import javax.crypto.spec.SecretKeySpec;
 import net.sf.qualitycheck.Check;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -282,4 +290,18 @@ public class CryptoUtils {
 			return new String(decBytes, StandardCharsets.UTF_8);
 		}
 	}
+	
+	public static InputStream decryptP7M(InputStream is) throws Exception {
+		try {
+			ASN1InputStream asn1InputStream = new ASN1InputStream(is);
+			ASN1Primitive asn1Primitive = asn1InputStream.readObject();
+			CMSSignedData cmsSignedData = new CMSSignedData(ContentInfo.getInstance(asn1Primitive));
+			return ((CMSProcessableByteArray)cmsSignedData.getSignedContent()).getInputStream();
+		} catch(Exception exc) {
+			throw exc;
+		}
+	}
+	
+	
+	
 }
