@@ -58,15 +58,25 @@ public class DigestValue {
 		this.digest = digest;
 	}
 	
-	public static DigestValue parse(String value) {
+	public static DigestValue parse(final String value) {
 		String algo = StringUtils.substringAfter(StringUtils.substringBefore(value, "}"), "{");
-		DigestAlgorithm algorithm = DigestAlgorithm.parse(algo, DigestAlgorithm.PLAIN);
+		
+		DigestAlgorithm algorithm;
+		String payload;
+		if (StringUtils.isBlank(algo)) {
+			algorithm = DigestAlgorithm.PLAIN;
+			payload = value;
+		} else {
+			algorithm = DigestAlgorithm.parse(algo);
+			payload = StringUtils.substringAfter(value, "}");
+		}
+		if (algorithm == null) throw new IllegalArgumentException("Algorithm NOT supported: " + algo);
+		
 		String prfName = null;
 		Integer iterations = null;
 		byte[] salt = null;
 		byte[] digest = null;
 		
-		String payload = StringUtils.substringAfter(value, "}");
 		if (DigestAlgorithm.PLAIN.equals(algorithm)) {
 			digest = payload.getBytes(StandardCharsets.UTF_8);
 			

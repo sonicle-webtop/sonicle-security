@@ -103,6 +103,8 @@ public class CryptoUtils {
 	
 		//DigestValue dv1 = new DigestValue("{PBKDF2}sha256:310000:RmFuY3lTYWx0:Tx6ClgRLksY4Hf2Ogbb5HeAa0XJeEtRoMivAXjc3hDk=");
 		
+		System.out.println("SHA256: " + DigestValue.parse("pippo").getDigestString());
+		
 		System.out.println(hash((String)null, DigestAlgorithm.PBKDF2));
 		String sha256 = hash("matteo", DigestAlgorithm.SHA256);
 		System.out.println("SHA256: " + sha256);
@@ -370,13 +372,16 @@ public class CryptoUtils {
 				return false;
 			}
 			
-			byte[] expDigest = parsed.getDigestBytes();
-			int diff = expDigest.length ^ digest.length;
-			for(int i = 0; i < expDigest.length && i < digest.length; i++) {
-				diff |= expDigest[i] ^ digest[i];
-			}
-			return diff == 0;
+			return byteArraysEquals(parsed.getDigestBytes(), digest);
 		}
+	}
+	
+	private static boolean byteArraysEquals(byte[] ba1, byte[] ba2) {
+		int diff = ba1.length ^ ba2.length;
+		for (int i = 0; i < ba1.length && i < ba2.length; i++) {
+			diff |= ba1[i] ^ ba2[i];
+		}
+		return diff == 0;
 	}
 	
 	public static String hash(final String s, final DigestAlgorithm algorithm) {
