@@ -33,6 +33,7 @@
 package com.sonicle.security;
 
 import com.sonicle.commons.AlgoUtils;
+import com.sonicle.commons.Base58;
 import com.sonicle.commons.LangUtils;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -82,7 +83,7 @@ public class CryptoUtils {
 	public static final String DEFAULT_PBKDF2_PRF = "SHA1";
 	public static final HashOptions DEFAULT_HASH_OPTIONS = new HashOptions();
 	
-	/*
+	
 	public static void main(String args[]) throws Exception {
 		//String key128 = hex(generateAESKey(128).getEncoded());
 		//String key192 = hex(generateAESKey(192).getEncoded());
@@ -103,6 +104,14 @@ public class CryptoUtils {
 	
 		//DigestValue dv1 = new DigestValue("{PBKDF2}sha256:310000:RmFuY3lTYWx0:Tx6ClgRLksY4Hf2Ogbb5HeAa0XJeEtRoMivAXjc3hDk=");
 		
+		System.out.println("Base58: " + Base58.encode(CryptoUtils.generateRandomBytes(6)));
+		System.out.println("Base58: " + Base58.encode(CryptoUtils.generateAESKey(128).getEncoded()));
+		System.out.println("Base58: " + Base58.encode(CryptoUtils.generateAESKey(128).getEncoded()));
+		System.out.println("Base58: " + Base58.encode(CryptoUtils.generateAESKey(128).getEncoded()));
+		System.out.println("Base58: " + Base58.encode(CryptoUtils.generateAESKey(128).getEncoded()));
+		System.out.println("hex: " + LangUtils.hexEncode(CryptoUtils.generateAESKey(128).getEncoded()));
+		
+		
 		System.out.println("SHA256: " + DigestValue.parse("pippo").getDigestString());
 		
 		System.out.println(hash((String)null, DigestAlgorithm.PBKDF2));
@@ -121,7 +130,7 @@ public class CryptoUtils {
 		
 		System.out.println("PBKDF2-SHA256: " + hash("matteo", DigestAlgorithm.PBKDF2, new HashOptions().withPseudoRandomFunctionName("SHA256").withDVKeyLength(128)));
 	}
-	*/
+	
 	
 	/**
 	 * Converts a key object to an hexadecimal String.
@@ -131,6 +140,17 @@ public class CryptoUtils {
 	 */
 	public static String hexEncode(final SecretKey key) {
 		return key != null ? LangUtils.hexEncode(key.getEncoded()) : null;
+	}
+	
+	public static byte[] generateRandomBytes(final int size) throws NoSuchAlgorithmException {
+		return generateRandomBytes(size, false);
+	}
+	
+	public static byte[] generateRandomBytes(final int size, final boolean strongRandom) throws NoSuchAlgorithmException {
+		SecureRandom random = strongRandom ? SecureRandom.getInstanceStrong() : new SecureRandom();
+		byte[] bytes = new byte[size];
+		random.nextBytes(bytes);
+		return bytes;
 	}
 	
 	/**

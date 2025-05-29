@@ -55,6 +55,7 @@ public interface Directory {
 	public abstract boolean validateUsername(DirectoryOptions opts, String username);
 	public abstract int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password);
 	public abstract char[] generatePassword(DirectoryOptions opts);
+	public abstract AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException;
 	public abstract AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
 	public abstract List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException;
 	public abstract void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException;

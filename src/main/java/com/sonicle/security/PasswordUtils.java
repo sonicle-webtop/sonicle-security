@@ -126,25 +126,6 @@ public class PasswordUtils {
 		return psw;
 	}
 	
-	public static String encryptSHA(String string) {
-		if(string == null) return null;
-		return new String(new Base64().encode(DigestUtils.sha1(string)));
-	}
-	
-	/*
-	public static String encryptSHA(String string) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA");
-			md.update(string.getBytes("UTF-8"));
-			return new String(new Base64().encode(md.digest()));
-			
-		} catch(UnsupportedEncodingException | NoSuchAlgorithmException ex) {
-			//logger.error("Unable to encrypt", ex);
-			return null;
-		}
-	}
-	*/
-	
 	/**
 	 * @deprecated this method should be avoided since that it NOT uses a random IV
 	 */

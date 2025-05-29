@@ -98,6 +98,11 @@ public class ImapDirectory extends AbstractDirectory {
 	public int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password) {
 		return 0;
 	}
+	
+	@Override
+	public AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException {
+		throw new DirectoryException("Not supported");
+	}
 
 	@Override
 	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {

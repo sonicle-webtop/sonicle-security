@@ -98,6 +98,11 @@ public class SftpDirectory extends AbstractDirectory {
 	public int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password) {
 		return 0;
 	}
+	
+	@Override
+	public AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException {
+		throw new DirectoryException("Not supported");
+	}
 
 	@Override
 	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
@@ -124,37 +129,37 @@ public class SftpDirectory extends AbstractDirectory {
 
 	@Override
 	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 
 	@Override
 	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 
 	@Override
 	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 
 	@Override
 	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 
 	@Override
 	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws EntryException, DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 
 	@Override
 	public void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 
 	@Override
 	public List<String> listGroups(DirectoryOptions opts, String domainId) throws DirectoryException {
-		throw new DirectoryException("Capability not supported");
+		throw new DirectoryException("Not supported");
 	}
 	
 	private URI createVfsUri(DirectoryOptions opts, Principal principal) throws URISyntaxException {

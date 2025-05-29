@@ -32,7 +32,7 @@
  */
 package com.sonicle.security;
 
-import java.text.MessageFormat;
+import com.sonicle.commons.LangUtils;
 import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -47,34 +47,31 @@ public class DomainAccount {
 	private final String local;
 	
 	/**
-	 * @deprecated Use buildFullName instead
+	 * @deprecated Use buildFullyQualifiedName instead
 	 */
-	@Deprecated
-	public static String buildName(String domain, String user) {
+	@Deprecated public static String buildName(String domain, String user) {
 		return user + "@" + domain;
 	}
 	
 	/**
 	 * @deprecated Use getLocal instead
 	 */
-	@Deprecated
-	public String getUser() {
+	@Deprecated public String getUser() {
 		return local;
 	}
 	
 	/**
 	 * @deprecated Use toString instead
 	 */
-	@Deprecated
-	public String getName() {
+	@Deprecated public String getName() {
 		return DomainAccount.buildName(domain, local);
 	}
 
-	public DomainAccount(final String accountName) {
-		int at = StringUtils.lastIndexOf(accountName, "@");
-		if(at == -1) throw new UnsupportedOperationException(MessageFormat.format("Unable to parse specified account name {0}", accountName));
-		this.domain = StringUtils.substring(accountName, at+1);
-		this.local = StringUtils.substring(accountName, 0, at);
+	public DomainAccount(final String fullyQualifiedAccountName) {
+		int at = StringUtils.lastIndexOf(fullyQualifiedAccountName, "@");
+		if (at == -1) throw new UnsupportedOperationException(LangUtils.formatMessage("Unable to parse specified account name {}", fullyQualifiedAccountName));
+		this.domain = StringUtils.substring(fullyQualifiedAccountName, at+1);
+		this.local = StringUtils.substring(fullyQualifiedAccountName, 0, at);
 	}
 
 	public DomainAccount(final String domain, final String local) {
@@ -96,7 +93,7 @@ public class DomainAccount {
 
 	@Override
 	public String toString() {
-		return buildFullName(domain, local);
+		return buildFullyQualifiedName(domain, local);
 	}
 
 	@Override
@@ -109,8 +106,8 @@ public class DomainAccount {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof DomainAccount == false) return false;
-		if(this == obj) return true;
+		if (obj instanceof DomainAccount == false) return false;
+		if (this == obj) return true;
 		final DomainAccount otherObject = (DomainAccount) obj;
 		return new EqualsBuilder()
 			.append(domain, otherObject.domain)
@@ -118,7 +115,19 @@ public class DomainAccount {
 			.isEquals();
 	}
 	
-	public static String buildFullName(final String domain, final String local) {
+	public static String buildFullyQualifiedName(final String domain, final String local) {
 		return Check.notNull(local, "local") + "@" + Check.notNull(domain, "domain");
+	}
+	
+	public static DomainAccount parse(final String fullyQualifiedName) {
+		return new DomainAccount(fullyQualifiedName);
+	}
+	
+	public static DomainAccount parseQuietly(final String fullyQualifiedName) {
+		try {
+			return parse(fullyQualifiedName);
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 }

@@ -103,6 +103,31 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
+	public AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException {
+		AbstractLdapConfigBuilder builder = getConfigBuilder();
+		
+		try {
+			ensureCapability(DirectoryCapability.USERS_READ);
+			
+			final String targetUserId = principal.getUserId();
+			final String baseDn = builder.getUserDn(opts);
+			final String filter = joinFilters(createUserTargetFilter(opts, targetUserId), builder.getUserFilter(opts));
+			final String[] attrs = createUserReturnAttrs(opts);
+			ConnectionFactory conFactory = createConnectionFactory(opts, true);
+			Collection<LdapEntry> ldEntries = ldapSearch(conFactory, baseDn, filter, attrs);
+			
+			for (LdapEntry ldEntry : ldEntries) {
+				if (StringUtils.equals(targetUserId, extractUserId(opts, ldEntry))) return createUserEntry(opts, ldEntry);
+			}
+			return null;
+		
+		} catch(LdapException ex) {
+			logger.error("LdapError", ex);
+			throw new DirectoryException(ex);
+		}
+	}
+	
+	@Override
 	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		
@@ -321,6 +346,11 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 			mods.add(new AttributeModification(AttributeModificationType.REPLACE, new LdapAttribute(builder.getUserDisplayNameField(opts), userEntry.displayName)));
 		}
 		return mods;
+	}
+	
+	protected String extractUserId(DirectoryOptions opts, LdapEntry ldapEntry) {
+		AbstractLdapConfigBuilder builder = getConfigBuilder();
+		return getEntryAttribute(ldapEntry, builder.getUserIdField(opts));
 	}
 	
 	protected AuthUser createUserEntry(DirectoryOptions opts, LdapEntry ldapEntry) {
