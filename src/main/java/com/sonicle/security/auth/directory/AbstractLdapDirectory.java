@@ -34,7 +34,7 @@ package com.sonicle.security.auth.directory;
 
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.RegexUtils;
-import com.sonicle.security.Principal;
+import com.sonicle.security.AuthPrincipal;
 import com.sonicle.security.ConnectionSecurity;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
@@ -87,23 +87,23 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	public static final Pattern PATTERN_USERNAME = Pattern.compile("^" + RegexUtils.MATCH_USERNAME_CHARS + "$");
 	
 	@Override
-	public String sanitizeUsername(DirectoryOptions opts, String username) {
+	public String sanitizeUsername(final DirectoryOptions opts, final String username) {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		return builder.getIsCaseSensitive(opts) ? username : StringUtils.lowerCase(username);
 	}
 	
 	@Override
-	public boolean validateUsername(DirectoryOptions opts, String username) {
+	public boolean validateUsername(final DirectoryOptions opts, final String username) {
 		return PATTERN_USERNAME.matcher(username).matches();
 	}
 	
 	@Override
-	public int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password) {
+	public int validatePasswordPolicy(final DirectoryOptions opts, final String username, final char[] password) {
 		return 0;
 	}
 	
 	@Override
-	public AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser exist(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -128,7 +128,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		
 		try {
@@ -151,7 +151,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		ArrayList<AuthUser> entries = new ArrayList<>();
 		
@@ -176,7 +176,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
+	public void addUser(final DirectoryOptions opts, final String domainId, final AuthUser entry) throws EntryException, DirectoryException {
 		Check.notNull(opts);
 		Check.notNull(entry);
 		
@@ -203,7 +203,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
+	public void updateUser(final DirectoryOptions opts, final String domainId, final AuthUser entry) throws DirectoryException {
 		Check.notNull(opts);
 		Check.notNull(entry);
 		
@@ -226,7 +226,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException {
+	public void deleteUser(final DirectoryOptions opts, final String domainId, final String userId) throws DirectoryException {
 		Check.notNull(opts);
 		Check.notNull(userId);
 		
@@ -245,7 +245,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException {
+	public void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] newPassword) throws DirectoryException {
 		Check.notNull(opts);
 		Check.notNull(userId);
 		Check.notNull(newPassword);
@@ -265,7 +265,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws DirectoryException {
+	public void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] oldPassword, final char[] newPassword) throws DirectoryException {
 		Check.notNull(opts);
 		Check.notNull(userId);
 		Check.notNull(oldPassword);
@@ -286,7 +286,7 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public List<String> listGroups(DirectoryOptions dopts, String domainId) throws DirectoryException {
+	public List<String> listGroups(final DirectoryOptions dopts, final String domainId) throws DirectoryException {
 		throw new UnsupportedOperationException("Not supported on this directory");
 	}
 	

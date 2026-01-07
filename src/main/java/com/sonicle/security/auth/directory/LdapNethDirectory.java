@@ -70,7 +70,7 @@ public final class LdapNethDirectory extends AbstractLdapDirectory {
 	}
 	
 	@Override
-	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+	public URI buildUri(final String host, final Integer port, final String path) throws URISyntaxException {
 		int iport = (port == null) ? -1 : port;
 		return new URI(SCHEME, null, host, iport, path, null, null);
 		// path can be ignored!

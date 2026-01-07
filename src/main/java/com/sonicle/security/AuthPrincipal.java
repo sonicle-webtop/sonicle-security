@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014 Sonicle S.r.l.
+/*
+ * Copyright (C) 2026 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,54 +28,21 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2014 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2026 Sonicle S.r.l.".
  */
-package com.sonicle.security.auth.directory;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.sonicle.security;
 
 /**
  *
  * @author malbinola
  */
-public final class LdapDirectory extends AbstractLdapDirectory {
-	private final static Logger logger = (Logger)LoggerFactory.getLogger(LdapDirectory.class);
-	public static final String SCHEME = "ldap";
+public class AuthPrincipal extends Principal {
 	
-	static final Collection<DirectoryCapability> CAPABILITIES = Collections.unmodifiableCollection(
-		EnumSet.of(
-			DirectoryCapability.PASSWORD_WRITE,
-			DirectoryCapability.USERS_READ,
-			DirectoryCapability.USERS_WRITE
-		)
-	);
-	
-	@Override
-	public String getScheme() {
-		return SCHEME;
-	}
-
-	@Override
-	public LdapConfigBuilder getConfigBuilder() {
-		return LdapConfigBuilder.getInstance();
+	public AuthPrincipal(final String domain, final String local) {
+		super(domain, local);
 	}
 	
-	@Override
-	public Collection<DirectoryCapability> getCapabilities() {
-		return CAPABILITIES;
-	}
-	
-	@Override
-	public URI buildUri(final String host, final Integer port, final String path) throws URISyntaxException {
-		int iport = (port == null) ? -1 : port;
-		return new URI(SCHEME, null, host, iport, path, null, null);
-		//int iport = (port == null) ? LdapConfigBuilder.DEFAULT_PORT : port;
-		//return new URI(SCHEME, null, host, iport, path, null, null);
+	public AuthPrincipal(final boolean impersonated, final String domain, final String local, final char[] password) {
+		super(impersonated, domain, local, password);
 	}
 }

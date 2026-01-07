@@ -32,8 +32,6 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.Principal;
-import com.sonicle.security.auth.DirectoryException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -76,7 +74,7 @@ public class ADDirectory extends AbstractLdapDirectory {
 	}
 	
 	@Override
-	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+	public URI buildUri(final String host, final Integer port, final String path) throws URISyntaxException {
 		int iport = (port == null) ? -1 : port;
 		return new URI(SCHEME, null, host, iport, path, null, null);
 		//int iport = (port == null) ? LdapConfigBuilder.DEFAULT_PORT : port;
@@ -84,13 +82,13 @@ public class ADDirectory extends AbstractLdapDirectory {
 	}
 	
 	@Override
-	public boolean validateUsername(DirectoryOptions opts, String username) {
+	public boolean validateUsername(final DirectoryOptions opts, final String username) {
 		return true;
 	}
 	
 	/*
 	@Override
-	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(DirectoryOptions opts, AuthenticatingPrincipal principal) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
 		
 		try {

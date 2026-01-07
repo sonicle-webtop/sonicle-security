@@ -33,6 +33,7 @@
 package com.sonicle.security.auth.directory;
 
 import com.sonicle.commons.EnumUtils;
+import com.sonicle.security.AuthPrincipal;
 import com.sonicle.security.Principal;
 import com.sonicle.security.ConnectionSecurity;
 import com.sonicle.security.auth.DirectoryException;
@@ -77,35 +78,35 @@ public class ImapDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public URI buildUri(String host, Integer port, String path) throws URISyntaxException {
+	public URI buildUri(final String host, final Integer port, final String path) throws URISyntaxException {
 		// path can be ignored!
 		int iport = (port == null) ? -1 : port;
 		return new URI(SCHEME, null, host, iport, null, null, null);
 	}
 
 	@Override
-	public String sanitizeUsername(DirectoryOptions opts, String username) {
+	public String sanitizeUsername(final DirectoryOptions opts, final String username) {
 		ImapConfigBuilder builder = getConfigBuilder();
 		return builder.getIsCaseSensitive(opts) ? username : StringUtils.lowerCase(username);
 	}
 
 	@Override
-	public boolean validateUsername(DirectoryOptions opts, String username) {
+	public boolean validateUsername(final DirectoryOptions opts, final String username) {
 		return true;
 	}
 
 	@Override
-	public int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password) {
+	public int validatePasswordPolicy(final DirectoryOptions opts, final String username, final char[] password) {
 		return 0;
 	}
 	
 	@Override
-	public AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser exist(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException {
 		throw new DirectoryException("Not supported");
 	}
 
 	@Override
-	public AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException {
+	public AuthUser authenticate(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException {
 		Store store = null;
 		
 		try {
@@ -122,41 +123,41 @@ public class ImapDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException {
+	public void addUser(final DirectoryOptions opts, final String domainId, final AuthUser entry) throws EntryException, DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException {
+	public void updateUser(final DirectoryOptions opts, final String domainId, final AuthUser entry) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException {
+	public void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] newPassword) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws EntryException, DirectoryException {
+	public void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] oldPassword, final char[] newPassword) throws EntryException, DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException {
+	public void deleteUser(final DirectoryOptions opts, final String domainId, final String userId) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 
 	@Override
-	public List<String> listGroups(DirectoryOptions opts, String domainId) throws DirectoryException {
+	public List<String> listGroups(final DirectoryOptions opts, final String domainId) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 	
-	private Store createStore(DirectoryOptions opts) throws NoSuchProviderException {
+	private Store createStore(final DirectoryOptions opts) throws NoSuchProviderException {
 		ImapConfigBuilder builder = getConfigBuilder();
 		//TODO: get external properties from DirectoryOptions
 		Properties props = new Properties(System.getProperties());

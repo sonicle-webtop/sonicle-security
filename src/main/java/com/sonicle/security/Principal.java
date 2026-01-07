@@ -46,37 +46,22 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *
  */
 public class Principal implements java.security.Principal, Serializable {
-	private final AuthenticationDomain authenticationDomain;
 	private final boolean impersonated;
-	private String name = null;
-	private String hashedName = null;
-	private String domainId = null;
-	private String userId = null;
+	private final String name;
+	private final String hashedName;
 	private char[] password = null;
 	private String displayName = null;
 	private AbstractDirectory.AuthUser directoryEntry = null;
 	
-	public Principal(AuthenticationDomain ad, boolean impersonated, String domainId, String userId, char[] password) {
-		this.authenticationDomain = ad;
-		this.impersonated = impersonated;
-		this.name = DomainAccount.buildName(domainId, userId);
-		this.hashedName = Principal.buildHashedName(this.name);
-		this.domainId = domainId;
-		this.userId = userId;
-		this.password = password;
-	}	
-	
-	public Principal(String domainId, String userId) {
-		authenticationDomain = null;
-		impersonated = false;
-		this.domainId = domainId;
-		this.userId = userId;
-		this.name = DomainAccount.buildName(this.domainId, userId);
-		this.hashedName = Principal.buildHashedName(this.name);
+	public Principal(final String domain, final String local) {
+		this(false, domain, local, null);
 	}
-
-	public AuthenticationDomain getAuthenticationDomain() {
-		return authenticationDomain;
+	
+	public Principal(final boolean impersonated, final String domain, final String local, final char[] password) {
+		this.impersonated = impersonated;
+		this.name = DomainAccount.buildFullyQualifiedName(domain, local);
+		this.hashedName = Principal.buildHashedName(this.name);
+		this.password = password;
 	}
 	
 	public boolean isImpersonated() {
@@ -94,45 +79,32 @@ public class Principal implements java.security.Principal, Serializable {
 	}
 	
 	/**
-	 * Gets the full name using the internet name as domain part.
-	 * This can return null in case of missing authenticationDomain.
-	 * @return The unique identifier.
-	 */
-	public String getFullInternetName() {
-		if (authenticationDomain == null) {
-			return null;
-		} else {
-			return DomainAccount.buildName(authenticationDomain.getInternetName(), userId);
-		}
-	}
-	
-	/**
-	 * Gets the full name that uniquely identify a user.
+	 * Gets the identifier that uniquely identify this principal.
 	 * This call is an alias og getName().
 	 * @return The unique identifier.
 	 */
-	public String getFullName() {
+	public String getID() {
 		return getName();
+	}
+	
+	public String getUniqueKey() {
+		return this.hashedName;
 	}
 	
 	/**
 	 * Gets the user ID.
-	 * Remember that in WebTop platform a user is uniquely recognized using
-	 * the composite identifier userId@domainId.
-	 * @return The user identifier.
+	 * @return The user local identifier.
 	 */
 	public String getUserId() {
-		return userId;
+		return DomainAccount.parse(name).getLocal();
 	}
 	
 	/**
-	 * Gets the (WebTop) domain ID.
-	 * Remember that in WebTop platform a user is uniquely recognized using
-	 * the composite identifier userId@domainId.
+	 * Gets the domain ID.
 	 * @return The domain identifier
 	 */
 	public String getDomainId() {
-		return domainId;
+		return DomainAccount.parse(name).getDomain();
 	}
 	
 	/**
@@ -152,14 +124,6 @@ public class Principal implements java.security.Principal, Serializable {
 		return displayName;
 	}
 	
-	public char[] getPassword() {
-		return password;
-	}
-	
-	public void setPassword(char[] password) {
-		this.password = password;
-	}
-	
 	/**
 	 * Sets the associated display name.
 	 * @param displayName The value of the name.
@@ -168,8 +132,16 @@ public class Principal implements java.security.Principal, Serializable {
 		this.displayName = displayName;
 	}
 	
-	public String getHashedName() {
-		return this.hashedName;
+	public char[] getPassword() {
+		return password;
+	}
+	
+	public void setPassword(char[] password) {
+		this.password = password;
+	}
+	
+	public String toFullyQualifiedUsername(final String domain) {
+		return DomainAccount.buildFullyQualifiedName(domain, getUserId());
 	}
 	
 	/**
@@ -204,8 +176,8 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Principal == false) return false;
-		if(this == obj) return true;
+		if (obj instanceof Principal == false) return false;
+		if (this == obj) return true;
 		final Principal otherObject = (Principal) obj;
 		return new EqualsBuilder()
 			.append(name, otherObject.name)
@@ -216,8 +188,8 @@ public class Principal implements java.security.Principal, Serializable {
 		return DigestUtils.md5Hex(name);
 	}
 	
-	public static String buildHashedName(String domainId, String userId) {
-		return buildHashedName(DomainAccount.buildName(domainId, userId));
+	public static String buildHashedName(String domain, String local) {
+		return buildHashedName(DomainAccount.buildFullyQualifiedName(domain, local));
 	}
 	
 	public static boolean xisAdminDomain(String domainId) {

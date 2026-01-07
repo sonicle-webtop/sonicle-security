@@ -32,7 +32,7 @@
  */
 package com.sonicle.security.auth.directory;
 
-import com.sonicle.security.Principal;
+import com.sonicle.security.AuthPrincipal;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
 import com.sonicle.security.auth.directory.AbstractDirectory.AuthUser;
@@ -50,18 +50,18 @@ public interface Directory {
 	public abstract String getScheme();
 	Collection<DirectoryCapability> getCapabilities();
 	public abstract <T extends AbstractConfigBuilder> T getConfigBuilder();
-	public abstract URI buildUri(String host, Integer port, String path) throws URISyntaxException;
-	public abstract String sanitizeUsername(DirectoryOptions opts, String username);
-	public abstract boolean validateUsername(DirectoryOptions opts, String username);
-	public abstract int validatePasswordPolicy(DirectoryOptions opts, String username, char[] password);
-	public abstract char[] generatePassword(DirectoryOptions opts);
-	public abstract AuthUser exist(DirectoryOptions opts, Principal principal) throws DirectoryException;
-	public abstract AuthUser authenticate(DirectoryOptions opts, Principal principal) throws DirectoryException;
-	public abstract List<AuthUser> listUsers(DirectoryOptions opts, String domainId) throws DirectoryException;
-	public abstract void addUser(DirectoryOptions opts, String domainId, AuthUser entry) throws EntryException, DirectoryException;
-	public abstract void updateUser(DirectoryOptions opts, String domainId, AuthUser entry) throws DirectoryException;
-	public abstract void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] newPassword) throws DirectoryException;
-	public abstract void updateUserPassword(DirectoryOptions opts, String domainId, String userId, char[] oldPassword, char[] newPassword) throws EntryException, DirectoryException;
-	public abstract void deleteUser(DirectoryOptions opts, String domainId, String userId) throws DirectoryException;
-	public abstract List<String> listGroups(DirectoryOptions opts, String domainId) throws DirectoryException;
+	public abstract URI buildUri(final String host, final Integer port, final String path) throws URISyntaxException;
+	public abstract String sanitizeUsername(final DirectoryOptions opts, final String username);
+	public abstract boolean validateUsername(final DirectoryOptions opts, final String username);
+	public abstract int validatePasswordPolicy(final DirectoryOptions opts, final String username, final char[] password);
+	public abstract char[] generatePassword(final DirectoryOptions opts);
+	public abstract AuthUser exist(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException;
+	public abstract AuthUser authenticate(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException;
+	public abstract List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException;
+	public abstract void addUser(final DirectoryOptions opts, final String domainId, final AuthUser entry) throws EntryException, DirectoryException;
+	public abstract void updateUser(final DirectoryOptions opts, String domainId, final AuthUser entry) throws DirectoryException;
+	public abstract void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] newPassword) throws DirectoryException;
+	public abstract void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] oldPassword, final char[] newPassword) throws EntryException, DirectoryException;
+	public abstract void deleteUser(final DirectoryOptions opts, final String domainId, final String userId) throws DirectoryException;
+	public abstract List<String> listGroups(final DirectoryOptions opts, final String domainId) throws DirectoryException;
 }
