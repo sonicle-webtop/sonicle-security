@@ -70,7 +70,7 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	/**
 	 * Gets the identifier that uniquely identify a user.
-	 * This is a composite field: userId@domainId.
+	 * This is a composite field: user@domain.
 	 * @return The unique identifier.
 	 */
 	@Override
@@ -105,6 +105,15 @@ public class Principal implements java.security.Principal, Serializable {
 	 */
 	public String getDomainId() {
 		return DomainAccount.parse(name).getDomain();
+	}
+	
+	/**
+	 * Check if this Principal's domain matches with passed domain ID.
+	 * @param domainId The domain ID to check.
+	 * @return `true` if matches
+	 */
+	public boolean hasDomainId(final String domainId) {
+		return StringUtils.equals(this.getDomainId(), domainId);
 	}
 	
 	/**
