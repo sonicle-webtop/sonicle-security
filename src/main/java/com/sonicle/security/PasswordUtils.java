@@ -37,6 +37,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.BadPaddingException;
@@ -203,5 +204,54 @@ public class PasswordUtils {
 			hash = DigestUtils.md5Hex(s);
 		}
 		return new String[]{redacted, hash};
+	}
+	
+	/**
+	 * Converts passed CharArray into String.
+	 * @param array The CharArray to convert, may be `null`.
+	 * @return The String representation of the source CharArray, or `null` if source is not defined.
+	 */
+	public static String asString(final char[] array) {
+		return (array != null) ? new String(array) : null;
+	}
+	
+	/**
+	 * Converts passed String into CharArray.
+	 * @param string The String to convert, may be `null`.
+	 * @return The CharArray representation of the source String, or `null` if source is not defined.
+	 */
+	public static char[] asCharArray(final String string) {
+		return (string != null) ? string.toCharArray() : null;
+	}
+	
+	/**
+	 * Compares two CharArrays, returning true if they represent equal sequences of characters. 
+	 * @param array1 The first Char array, may be `null`.
+	 * @param array2 The second Char array, may be `null`.
+	 * @return `true` if the Char arrays are equal (case-sensitive), or both `null`
+	 */
+	public static boolean equals(final char[] array1, final char[] array2) {
+		return Arrays.equals(array1, array2);
+	}
+	
+	/**
+	 * Clears the passed CharArray in order to frees characters from memory.
+	 * @param array The CharArray to clear.
+	 */
+	public static void clear(final char[] array) {
+		if (array != null) Arrays.fill(array, '\0');
+	}
+	
+	/**
+	 * Tests if a CharArray is empty (""), null, or contains only whitespace.
+	 * @param array The CharArray to check, can be `null`.
+	 * @return `true` if the CharArray is `null`, empty or whitespace only.
+	 */
+	public static boolean isBlank(final char[] array) {
+		if (array == null) return true;
+		for (char c : array) {
+			if (!Character.isWhitespace(c)) return false;
+		}
+		return true;
 	}
 }

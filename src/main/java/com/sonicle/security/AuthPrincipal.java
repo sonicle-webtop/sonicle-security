@@ -37,12 +37,22 @@ package com.sonicle.security;
  * @author malbinola
  */
 public class AuthPrincipal extends Principal {
+	private char[] password = null;
 	
 	public AuthPrincipal(final String domain, final String local) {
-		super(domain, local);
+		this(false, domain, local, null);
 	}
 	
 	public AuthPrincipal(final boolean impersonated, final String domain, final String local, final char[] password) {
-		super(impersonated, domain, local, password);
+		super(impersonated, domain, local);
+		this.password = password;
+	}
+	
+	public char[] getPassword() {
+		return password;
+	}
+	
+	public void setPassword(char[] password) {
+		this.password = password;
 	}
 }

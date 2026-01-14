@@ -49,19 +49,17 @@ public class Principal implements java.security.Principal, Serializable {
 	private final boolean impersonated;
 	private final String name;
 	private final String hashedName;
-	private char[] password = null;
 	private String displayName = null;
 	private AbstractDirectory.AuthUser directoryEntry = null;
 	
 	public Principal(final String domain, final String local) {
-		this(false, domain, local, null);
+		this(false, domain, local);
 	}
 	
-	public Principal(final boolean impersonated, final String domain, final String local, final char[] password) {
+	public Principal(final boolean impersonated, final String domain, final String local) {
 		this.impersonated = impersonated;
 		this.name = DomainAccount.buildFullyQualifiedName(domain, local);
 		this.hashedName = Principal.buildHashedName(this.name);
-		this.password = password;
 	}
 	
 	public boolean isImpersonated() {
@@ -139,14 +137,6 @@ public class Principal implements java.security.Principal, Serializable {
 	 */
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
-	}
-	
-	public char[] getPassword() {
-		return password;
-	}
-	
-	public void setPassword(char[] password) {
-		this.password = password;
 	}
 	
 	public String toFullyQualifiedUsername(final String domain) {
