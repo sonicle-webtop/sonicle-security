@@ -45,17 +45,11 @@ public enum DigestAlgorithm {
 	PLAIN {
 		@Override
 		public String getAlgorithmName() { return null; }
-		
-		@Override
-		public boolean isSalted() { return false; }
 	},
 	// MD5 (insecure, do NOT use it for passwords)
 	MD5 {
 		@Override
 		public String getAlgorithmName() { return "MD5"; }
-		
-		@Override
-		public boolean isSalted() { return false; }
 	},
 	// Salted MD5 (insecure, do NOT use it for passwords)
 	SMD5 {
@@ -69,9 +63,6 @@ public enum DigestAlgorithm {
 	SHA {
 		@Override
 		public String getAlgorithmName() { return "SHA-1"; }
-		
-		@Override
-		public boolean isSalted() { return false; }
 	},
 	// Salted SHA-1 (almost insecure, do NOT use it for passwords)
 	SSHA {
@@ -85,9 +76,6 @@ public enum DigestAlgorithm {
 	SHA256 {
 		@Override
 		public String getAlgorithmName() { return "SHA-256"; }
-		
-		@Override
-		public boolean isSalted() { return false; }
 	},
 	// Salted SHA-256
 	SSHA256 {
@@ -101,9 +89,6 @@ public enum DigestAlgorithm {
 	SHA512 {
 		@Override
 		public String getAlgorithmName() { return "SHA-512"; }
-		
-		@Override
-		public boolean isSalted() { return false; }
 	},
 	// Salted SHA-512
 	SSHA512 {
@@ -130,7 +115,7 @@ public enum DigestAlgorithm {
 		@Override
 		public String getAlgorithmNamePRFSuffix(final String prf) {
 			String upper = StringUtils.upperCase(prf);
-			if (StringUtils.equalsAny(prf, "SHA1", "SHA224", "SHA256", "SHA384", "SHA512")) {
+			if (StringUtils.equalsAny(upper, "SHA1", "SHA224", "SHA256", "SHA384", "SHA512")) {
 				return "WithHmac" + upper;
 			}
 			return null;
@@ -147,13 +132,20 @@ public enum DigestAlgorithm {
 	*/
 	
 	public abstract String getAlgorithmName();
-	public abstract boolean isSalted();
+	
+	public boolean isSalted() {
+		return false;
+	}
 	
 	public boolean hasPRFFunction() {
 		return false;
 	}
 	
 	public boolean hasNumOfIterations() {
+		return false;
+	}
+	
+	public boolean hasSecretKey() {
 		return false;
 	}
 	

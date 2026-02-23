@@ -32,7 +32,6 @@
  */
 package com.sonicle.security;
 
-import com.sonicle.commons.AlgoUtils;
 import com.sonicle.commons.Base58;
 import com.sonicle.commons.LangUtils;
 import java.io.InputStream;
@@ -52,6 +51,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -59,6 +59,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import net.sf.qualitycheck.Check;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -83,13 +84,13 @@ public class CryptoUtils {
 	public static final String DEFAULT_PBKDF2_PRF = "SHA1";
 	public static final HashOptions DEFAULT_HASH_OPTIONS = new HashOptions();
 	
-	
+	/*
 	public static void main(String args[]) throws Exception {
 		//String key128 = hex(generateAESKey(128).getEncoded());
 		//String key192 = hex(generateAESKey(192).getEncoded());
-		//byte[] key256bytes = generateAESKey(256).getEncoded();
-		//String key256hex = Hex.encodeHexString(key256bytes);
-		//byte[] k2 = Hex.decodeHex(key256hex.toCharArray());
+		byte[] key256bytes = generateAESKey(256).getEncoded();
+		String key256hex = Hex.encodeHexString(key256bytes);
+		byte[] k2 = Hex.decodeHex(key256hex.toCharArray());
 		
 		//String utf8256 = new String(key256bytes, StandardCharsets.UTF_8);
 		//String key256hex = hex(key256bytes);
@@ -97,10 +98,10 @@ public class CryptoUtils {
 		//byte[] keyBytes = Hex.decodeHex(key256hex.toCharArray());
 		//String key = new String(keyBytes, StandardCharsets.UTF_8);
 		
-		//String text = "myP$as€£rd";
-		//String enc1 = encryptAES(text, k2);
-		//String dec1 = decryptAES(enc1, k2);
-		//System.out.println(enc1);
+		String text = "myP$as€£rd";
+		String enc1 = encryptAES(text, k2);
+		String dec1 = decryptAES(enc1, k2);
+		System.out.println(enc1);
 	
 		//DigestValue dv1 = new DigestValue("{PBKDF2}sha256:310000:RmFuY3lTYWx0:Tx6ClgRLksY4Hf2Ogbb5HeAa0XJeEtRoMivAXjc3hDk=");
 		
@@ -122,6 +123,16 @@ public class CryptoUtils {
 		System.out.println("SHA512: " + sha512);
 		System.out.println("SHA512 verify: " + verifyDigest("matteo3", sha512));
 		String pbkdf2_sha1 = hash("matteo", DigestAlgorithm.PBKDF2);
+		
+		HashOptions opts = new HashOptions()
+			.withPseudoRandomFunctionName("SHA256")
+			.withNumOfIterations(10000)
+			.withSaltSize(128);
+		String s16 = CryptoUtils.generateBase64RandomToken(16);
+		String s32 = CryptoUtils.generateBase64RandomToken(32);
+		String s = CryptoUtils.generateBase64RandomToken(32);
+		String pbkdf2_sha256_ = hash(s, DigestAlgorithm.PBKDF2, opts);
+		
 		System.out.println("PBKDF2-SHA1: " + pbkdf2_sha1);
 		System.out.println("PBKDF2-SHA1 verify: " + verifyDigest("matteo3", pbkdf2_sha1));
 		String pbkdf2_sha256 = hash("matteo", DigestAlgorithm.PBKDF2, new HashOptions().withPseudoRandomFunctionName("SHA256"));
@@ -130,7 +141,7 @@ public class CryptoUtils {
 		
 		System.out.println("PBKDF2-SHA256: " + hash("matteo", DigestAlgorithm.PBKDF2, new HashOptions().withPseudoRandomFunctionName("SHA256").withDVKeyLength(128)));
 	}
-	
+	*/
 	
 	/**
 	 * Converts a key object to an hexadecimal String.
@@ -142,15 +153,56 @@ public class CryptoUtils {
 		return key != null ? LangUtils.hexEncode(key.getEncoded()) : null;
 	}
 	
+	/**
+	 * Generates a random byteArray of the specified length.
+	 * @param size The size in bytes of the byteArray.
+	 * @return A byteArray filled by random bytes.
+	 * @throws NoSuchAlgorithmException if no algorithm is avaiable
+	 */
 	public static byte[] generateRandomBytes(final int size) throws NoSuchAlgorithmException {
 		return generateRandomBytes(size, false);
 	}
 	
+	/**
+	 * Generates a random byteArray of the specified length.
+	 * @param size The size in bytes of the byteArray.
+	 * @param strongRandom Set to `true` to use a strong instance of the SecureRandom generator.
+	 * @return A byteArray filled by random bytes.
+	 * @throws NoSuchAlgorithmException if no algorithm is avaiable
+	 */
 	public static byte[] generateRandomBytes(final int size, final boolean strongRandom) throws NoSuchAlgorithmException {
 		SecureRandom random = strongRandom ? SecureRandom.getInstanceStrong() : new SecureRandom();
 		byte[] bytes = new byte[size];
 		random.nextBytes(bytes);
 		return bytes;
+	}
+	
+	/**
+	 * Generates a random token starting from a random byteArray of the specified size.
+	 * The resulting random material is finally converted in Hex String.
+	 *  - 16 bytes -> 32 characters
+	 *  - 24 bytes -> 48 characters
+	 *  - 32 bytes -> 64 characters
+	 * @param size The size in bytes of the intermediate random byteArray.
+	 * @return A random token in Hex form.
+	 * @throws NoSuchAlgorithmException if no algorithm is avaiable
+	 */
+	public static String generateHexRandomToken(final int size) throws NoSuchAlgorithmException {
+		return LangUtils.hexEncode(CryptoUtils.generateRandomBytes(size));
+	}
+	
+	/**
+	 * Generates a random token starting from a random byteArray of the specified size.
+	 * The resulting random material is finally converted in Base64URL Sring.
+	 *  - 16 bytes -> 22 characters
+	 *  - 24 bytes -> 32 characters
+	 *  - 32 bytes -> 43 characters
+	 * @param size The size in bytes of the intermediate random byteArray.
+	 * @return A random token in Base64 form.
+	 * @throws NoSuchAlgorithmException if no algorithm is avaiable
+	 */
+	public static String generateBase64RandomToken(final int size) throws NoSuchAlgorithmException {
+		return toBase64String(CryptoUtils.generateRandomBytes(size));
 	}
 	
 	/**
@@ -355,7 +407,7 @@ public class CryptoUtils {
 	/**
 	 * Generates a random Salt of specified size.
 	 * Note that using a "strong" algorithm may be slow on certain systems (especially on some Linux).
-	 * @param size Length of the salt in bitsbits: 128, 192 or 256.
+	 * @param size Length of the salt in bits: 128, 192 or 256.
 	 * @param strongRandom Set to `true` to generate the random material using a "strong" algorithm (as indicated by {@code securerandom.strongAlgorithms} property), otherwise the "default" algorithm will be used.
 	 * @return The generated Salt
 	 * @throws NoSuchAlgorithmException 
@@ -368,6 +420,13 @@ public class CryptoUtils {
 		return salt;
 	}
 	
+	/**
+	 * Verifies whether the given plain text value matches an expected digest representation.
+	 * The `expectedValue` string is parsed to determine the digest algorithm and its parameters (salt, iterations, PRF, etc.).
+	 * @param s The plain text value to verify. Null safe.
+	 * @param expectedValue The expected digest value in encoded form. Must not be empty.
+	 * @return `true` if the value matches the expected digest, `false` otherwise
+	 */
 	public static boolean verifyDigest(final String s, final String expectedValue) {
 		if (s == null) return false;
 		Check.notEmpty(expectedValue, "expectedValue");
@@ -383,6 +442,7 @@ public class CryptoUtils {
 				if (DigestAlgorithm.PBKDF2.equals(algorithm)) {
 					int dvKeyLength = parsed.getDigestBytes().length * 8;
 					digest = generatePBKDF2Secret(s.toCharArray(), algorithm.getAlgorithmNamePRFSuffix(parsed.getPRFName()), parsed.getSaltBytes(), parsed.getIterations(), dvKeyLength);
+					
 				} else {
 					digest = generateDigest(s.toCharArray(), algorithm.getAlgorithmName(), parsed.getSaltBytes());
 				}
@@ -396,32 +456,82 @@ public class CryptoUtils {
 		}
 	}
 	
-	private static boolean byteArraysEquals(byte[] ba1, byte[] ba2) {
-		int diff = ba1.length ^ ba2.length;
-		for (int i = 0; i < ba1.length && i < ba2.length; i++) {
-			diff |= ba1[i] ^ ba2[i];
+	/**
+	 * Verifies whether the given plain text value matches an expected Mac digest representation.
+	 * @param s The plain text value to verify. Null safe.
+	 * @param expectedValue The expected Mac digest (es. signature). Must not be empty.
+	 * @param algorithm The MAC algorithm.
+	 * @param secretKey The Mac secret key.
+	 * @return `true` if the value matches the expected digest, `false` otherwise
+	 */
+	public static boolean verifyMac(final String s, final String expectedValue, final MacAlgorithm algorithm, final byte[] secretKey) {
+		if (s == null) return false;
+		Check.notEmpty(expectedValue, "expectedValue");
+		Check.notNull(algorithm, "algorithm");
+		Check.notNull(secretKey, "secretKey");
+		
+		MacValue parsed = MacValue.parse(algorithm, expectedValue);
+		if (MacAlgorithm.PLAIN.equals(algorithm)) {
+			return s.equals(parsed.getMacString());
+			
+		} else {
+			byte[] mac = null;
+			try {
+				mac = generateMac(s.toCharArray(), algorithm.getAlgorithmName(), secretKey);
+				
+			} catch (NoSuchAlgorithmException | InvalidKeyException ex) {
+				LOGGER.error("Mac computation failed", ex);
+				return false;
+			}
+			
+			return byteArraysEquals(parsed.getMacBytes(), mac);
 		}
-		return diff == 0;
 	}
 	
+	/**
+	 * Computes a digest for the given string using the specified algorithm and default options.
+	 * @param s The input string. Null safe.
+	 * @param algorithm The digest algorithm to use.
+	 * @return the encoded digest value, or null
+	 */
 	public static String hash(final String s, final DigestAlgorithm algorithm) {
 		return hash(s != null ? s.toCharArray() : null, algorithm, DEFAULT_HASH_OPTIONS);
 	}
 	
+	/**
+	 * Computes a digest for the given string using the specified algorithm and default options.
+	 * @param s The input string. Null safe.
+	 * @param algorithm The digest algorithm to use.
+	 * @param options Hashing options such as salt size, iterations and PRF.
+	 * @return the encoded digest value, or null
+	 */
 	public static String hash(final String s, final DigestAlgorithm algorithm, final HashOptions options) {
 		return hash(s != null ? s.toCharArray() : null, algorithm, options);
 	}
 	
+	/**
+	 * Computes a digest for the given character array using the specified algorithm and default options.
+	 * @param s The input value as character array. Null safe.
+	 * @param algorithm The digest algorithm to use.
+	 * @return the encoded digest value, or null
+	 */
 	public static String hash(final char[] s, final DigestAlgorithm algorithm) {
 		return hash(s, algorithm, DEFAULT_HASH_OPTIONS);
 	}
 	
+	/**
+	 * Computes a digest for the given character array using the specified algorithm and hashing options.
+	 * @param s The input value as character array. Null safe.
+	 * @param algorithm The digest algorithm to use.
+	 * @param options Hashing options such as salt size, iterations and PRF.
+	 * @return the encoded digest value, or null
+	 */
 	public static String hash(final char[] s, final DigestAlgorithm algorithm, final HashOptions options) {
 		if (s == null) return null;
 		Check.notNull(algorithm, "algorithm");
 		
 		if (DigestAlgorithm.PLAIN.equals(algorithm)) {
-			return DigestValue.toValue(algorithm, toBytes(s), null, null, null);
+			return DigestValue.print(algorithm, toByteArray(s), null, null, null, false);
 			
 		} else {
 			try {
@@ -430,15 +540,13 @@ public class CryptoUtils {
 					int dvKeyLength = returnPBKDF2KeyLength(options.dvKeyLength, prf);
 					byte[] salt = generateSalt(options.saltSize, options.useStrongRandom);
 					byte[] digest = generatePBKDF2Secret(s, algorithm.getAlgorithmNamePRFSuffix(prf), salt, options.numOfIterations, dvKeyLength);
-
-					return DigestValue.toValue(algorithm, digest, salt, options.numOfIterations, prf);
-
+					return DigestValue.print(algorithm, digest, salt, options.numOfIterations, prf, false);
+					
 				} else {
 					byte[] salt = null;
 					if (algorithm.isSalted()) salt = generateSalt(options.saltSize, options.useStrongRandom);
 					byte[] digest = generateDigest(s, algorithm.getAlgorithmName(), salt);
-
-					return DigestValue.toValue(algorithm, digest, salt, null, null);
+					return DigestValue.print(algorithm, digest, salt, null, null, false);
 				}
 			} catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
 				LOGGER.error("Digest computation failed", ex);
@@ -447,17 +555,59 @@ public class CryptoUtils {
 		}
 	}
 	
+	/**
+	 * Computes a digest for the given character array using the specified algorithm and hashing options.
+	 * @param s The input value as character array. Null safe.
+	 * @param algorithm The digest algorithm to use.
+	 * @param secretKey The secretKey to 
+	 * @return the encoded digest value, or null
+	 */
+	public static String computeMac(final char[] s, final MacAlgorithm algorithm, final byte[] secretKey) {
+		if (s == null) return null;
+		Check.notNull(algorithm, "algorithm");
+		Check.notNull(secretKey, "secretKey");
+		
+		if (MacAlgorithm.PLAIN.equals(algorithm)) {
+			return MacValue.print(algorithm, toByteArray(s), true);
+			
+		} else {
+			try {
+				byte[] mac = generateMac(s, algorithm.getAlgorithmName(), secretKey);
+				return MacValue.print(algorithm, mac, true);
+
+			} catch (NoSuchAlgorithmException | InvalidKeyException ex) {
+				LOGGER.error("Mac computation failed", ex);
+				return null;
+			}
+		}
+	}
+	
+	/**
+	 * Generates a message digest for the given character array using the specified algorithm.
+	 * @param s The input value as a character array. Null safe.
+	 * @param algorithm The message digest algorithm.
+	 * @return the computed digest as a byte array
+	 * @throws NoSuchAlgorithmException 
+	 */
 	public static byte[] generateDigest(final char[] s, final String algorithm) throws NoSuchAlgorithmException {
 		return generateDigest(s, algorithm, null);
 	}
 	
+	/**
+	 * Generates a message digest for the given character array using the specified algorithm and an optional salt.
+	 * @param s The input value as a character array. Null safe.
+	 * @param algorithm The message digest algorithm.
+	 * @param salt Optional salt to prepend to the digest computation.
+	 * @return the computed digest as a byte array
+	 * @throws NoSuchAlgorithmException 
+	 */
 	public static byte[] generateDigest(final char[] s, final String algorithm, final byte[] salt) throws NoSuchAlgorithmException {
 		if (s == null) return null;
 		Check.notEmpty(algorithm, "algorithm");
 		
 		MessageDigest md = MessageDigest.getInstance(algorithm);
 		if (salt != null) md.update(salt);
-		return md.digest(toBytes(s));
+		return md.digest(toByteArray(s));
 	}
 	
 	/**
@@ -477,6 +627,17 @@ public class CryptoUtils {
 		}
 	}
 	
+	/**
+	 * Generates a PBKDF2-derived secret from the given source array.
+	 * @param s The source character array. Null safe.
+	 * @param algorithmPRFSuffix The PBKDF2 PRF algorithm suffix (e.g. {@code "WithHmacSHA256"}) it is used to build the full algorithm name.
+	 * @param salt The salt bytes to use for key derivation.
+	 * @param iterations The number of PBKDF2 iterations; must be greater than 0.
+	 * @param keyLength The DV key-length to use; must be greater than 0.
+	 * @return The digested input as a byte array
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException 
+	 */
 	public static byte[] generatePBKDF2Secret(final char[] s, final String algorithmPRFSuffix, final byte[] salt, final int iterations, final int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		if (s == null) return null;
 		Check.notNull(salt, "salt");
@@ -488,7 +649,26 @@ public class CryptoUtils {
 		return factory.generateSecret(spec).getEncoded();
 	}
 	
-	private static byte[] toBytes(char[] chars) {
+	/**
+	 * Generates a Mac digest for the given character array using the specified algorithm and key.
+	 * @param s The source character array. Null safe.
+	 * @param algorithm The Mac digest algorithm.
+	 * @param key The secure key.
+	 * @return the computed Mac digest as a byte array
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeyException 
+	 */
+	public static byte[] generateMac(final char[] s, final String algorithm, final byte[] key) throws NoSuchAlgorithmException, InvalidKeyException {
+		if (s == null) return null;
+		Check.notEmpty(algorithm, "algorithm");
+		Check.notNull(key, "key");
+		
+		Mac mac = Mac.getInstance(algorithm);
+		mac.init(new SecretKeySpec(key, algorithm));
+		return mac.doFinal(toByteArray(s));
+	}
+	
+	public static byte[] toByteArray(final char[] chars) {
 		CharBuffer charBuffer = CharBuffer.wrap(chars);
 		ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(charBuffer);
 		byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), byteBuffer.position(), byteBuffer.limit());
@@ -496,8 +676,33 @@ public class CryptoUtils {
 		return bytes;
 	}
 	
+	public static String toUTF8String(final byte[] bytes) {
+		return (bytes == null) ? null : new String(bytes, StandardCharsets.UTF_8);
+	}
+	
+	public static byte[] toUTF8ByteArray(final String s) {
+		return (s == null) ? null : s.getBytes(StandardCharsets.UTF_8);
+	}
+	
+	public static byte[] toBase64ByteArray(final String s) {
+		return (s == null) ? null : Base64.getUrlDecoder().decode(s);
+	}
+	
+	public static String toBase64String(final byte[] bytes) {
+		return (bytes == null) ? null : Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+	}
+	
+	private static boolean byteArraysEquals(byte[] ba1, byte[] ba2) {
+		int diff = ba1.length ^ ba2.length;
+		for (int i = 0; i < ba1.length && i < ba2.length; i++) {
+			diff |= ba1[i] ^ ba2[i];
+		}
+		return diff == 0;
+	}
+	
 	public static class HashOptions {
 		private boolean useStrongRandom = DEFAULT_USE_STRONG_RANDOM;
+		private boolean encodeOutput = true;
 		private int saltSize = DEFAULT_SALT_SIZE;
 		private int numOfIterations = 65536; // used for PBKDF2 algo
 		private String prfName = null;
@@ -505,6 +710,11 @@ public class CryptoUtils {
 		
 		public HashOptions withUseStrongRandom(boolean useStrongRandom) {
 			this.useStrongRandom = useStrongRandom;
+			return this;
+		}
+		
+		public HashOptions withEncodeOutput(boolean encodeOutput) {
+			this.encodeOutput = encodeOutput;
 			return this;
 		}
 		
@@ -518,18 +728,22 @@ public class CryptoUtils {
 			return this;
 		}
 		
-		public HashOptions withDVKeyLength(int dvKeyLength) {
-			this.dvKeyLength = Check.greaterOrEqualThan(0, dvKeyLength, "dvKeyLength");
-			return this;
-		}
-		
 		public HashOptions withPseudoRandomFunctionName(String prfName) {
 			this.prfName = StringUtils.upperCase(prfName);
 			return this;
 		}
 		
+		public HashOptions withDVKeyLength(int dvKeyLength) {
+			this.dvKeyLength = Check.greaterOrEqualThan(0, dvKeyLength, "dvKeyLength");
+			return this;
+		}
+		
 		public boolean isUseStrongRandom() {
 			return useStrongRandom;
+		}
+		
+		public boolean isEncodeOutput() {
+			return encodeOutput;
 		}
 
 		public int getSaltSize() {

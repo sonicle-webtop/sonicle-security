@@ -147,7 +147,7 @@ public class Principal implements java.security.Principal, Serializable {
 	 * Returns and clear any authentication result object previously set.
 	 * @return 
 	 */
-	public AbstractDirectory.AuthUser popDirectoryEntry() {
+	@Deprecated public AbstractDirectory.AuthUser popDirectoryEntry() {
 		AbstractDirectory.AuthUser de = this.directoryEntry;
 		this.directoryEntry = null;
 		return de;
@@ -157,7 +157,7 @@ public class Principal implements java.security.Principal, Serializable {
 	 * Saves directory authentication result for later.
 	 * @param directoryEntry The data object.
 	 */
-	public void pushDirectoryEntry(AbstractDirectory.AuthUser directoryEntry) {
+	@Deprecated public void pushDirectoryEntry(AbstractDirectory.AuthUser directoryEntry) {
 		this.directoryEntry = directoryEntry;
 	}
 	

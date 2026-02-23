@@ -58,45 +58,6 @@ public class DigestValue {
 		this.digest = digest;
 	}
 	
-	public static DigestValue parse(final String value) {
-		String algo = StringUtils.substringAfter(StringUtils.substringBefore(value, "}"), "{");
-		
-		DigestAlgorithm algorithm;
-		String payload;
-		if (StringUtils.isBlank(algo)) {
-			algorithm = DigestAlgorithm.PLAIN;
-			payload = value;
-		} else {
-			algorithm = DigestAlgorithm.parse(algo);
-			payload = StringUtils.substringAfter(value, "}");
-		}
-		if (algorithm == null) throw new IllegalArgumentException("Algorithm NOT supported: " + algo);
-		
-		String prfName = null;
-		Integer iterations = null;
-		byte[] salt = null;
-		byte[] digest = null;
-		
-		if (DigestAlgorithm.PLAIN.equals(algorithm)) {
-			digest = payload.getBytes(StandardCharsets.UTF_8);
-			
-		} else {
-			String[] tokens = StringUtils.splitPreserveAllTokens(payload, ":");
-			digest = LangUtils.base64Decode(extractToken(tokens, tokens.length -1, "Digest"));
-			if (algorithm.isSalted()) {
-				salt = LangUtils.base64Decode(extractToken(tokens, tokens.length -2, "Salt"));
-			}
-			if (algorithm.hasNumOfIterations()) {
-				iterations = Integer.valueOf(extractToken(tokens, tokens.length -3, "NumOfIterations"));
-			}
-			if (algorithm.hasPRFFunction()) {
-				prfName = extractToken(tokens, tokens.length -4, "PRF Name");
-			}
-		}
-		
-		return new DigestValue(algorithm, prfName, iterations, salt, digest);
-	}
-	
 	/**
 	 * Returns the configured DigestAlgorithm enum.
 	 * @return 
@@ -173,15 +134,72 @@ public class DigestValue {
 		return new String(digest, charset);
 	}
 	
+	public static DigestValue parse(final String value) {
+		String algo = StringUtils.substringAfter(StringUtils.substringBefore(value, "}"), "{");
+		
+		DigestAlgorithm algorithm;
+		String payload;
+		if (StringUtils.isBlank(algo)) {
+			algorithm = DigestAlgorithm.PLAIN;
+			payload = value;
+		} else {
+			algorithm = DigestAlgorithm.parse(algo);
+			payload = StringUtils.substringAfter(value, "}");
+		}
+		if (algorithm == null) throw new IllegalArgumentException("Algorithm NOT supported: " + algo);
+		
+		return parse(algorithm, payload);
+	}
+	
+	public static DigestValue parse(final DigestAlgorithm algorithm, final String payload) {
+		String prfName = null;
+		Integer iterations = null;
+		byte[] salt = null;
+		byte[] digest = null;
+		if (DigestAlgorithm.PLAIN.equals(algorithm)) {
+			digest = CryptoUtils.toUTF8ByteArray(payload);
+			
+		} else {
+			String[] tokens = StringUtils.splitPreserveAllTokens(payload, ":");
+			digest = LangUtils.base64Decode(extractToken(tokens, tokens.length -1, "Digest"));
+			if (algorithm.isSalted()) {
+				salt = LangUtils.base64Decode(extractToken(tokens, tokens.length -2, "Salt"));
+			}
+			if (algorithm.hasNumOfIterations()) {
+				iterations = Integer.valueOf(extractToken(tokens, tokens.length -3, "NumOfIterations"));
+			}
+			if (algorithm.hasPRFFunction()) {
+				prfName = extractToken(tokens, tokens.length -4, "PRF Name");
+			}
+		}
+		
+		return new DigestValue(algorithm, prfName, iterations, salt, digest);
+	}
+	
+	/**
+	 * Converts the computed Digest bytes into String output.
+	 * @param algorithm The Digest algorithm used.
+	 * @param digest The computed Digest byte array.
+	 * @param salt The salt byte array used. Can be null.
+	 * @param iterations Number of iterations. Can be null.
+	 * @param prfName The PRF function name, if any. Can be null.
+	 * @param rawOutput Set to `true` to return the raw output directly, without algorithm prefix.
+	 * @return 
+	 */
+	public static String print(final DigestAlgorithm algorithm, final byte[] digest, final byte[] salt, final Integer iterations, final String prfName, final boolean rawOutput) {
+		Check.notNull(algorithm, "algorithm");
+		String digestString = DigestAlgorithm.PLAIN.equals(algorithm) ? CryptoUtils.toUTF8String(digest) : LangUtils.base64Encode(digest);
+		String outString = LangUtils.joinStrings(":", StringUtils.upperCase(prfName), LangUtils.toString(iterations), LangUtils.base64Encode(salt), digestString);
+		if (rawOutput) {
+			return outString;
+		} else {
+			return "{" + EnumUtils.getName(algorithm) + "}" + outString;
+		}
+	}
+	
 	private static String extractToken(String[] tokens, int tokenIndex, String tokenName) {
 		Check.greaterOrEqualThan(0, tokenIndex, "Unable to get " + tokenName + " token at position " + tokenIndex);
 		Check.lesserThan(tokens.length, tokenIndex, "Unable to get " + tokenName + " token at position " + tokenIndex);
 		return tokens[tokenIndex];
-	}
-	
-	public static String toValue(final DigestAlgorithm algorithm, final byte[] digest, final byte[] salt, final Integer iterations, final String prfName) {
-		Check.notNull(algorithm, "algorithm");
-		String digestString = DigestAlgorithm.PLAIN.equals(algorithm) ? new String(digest, StandardCharsets.UTF_8) : LangUtils.base64Encode(digest);
-		return "{" + EnumUtils.getName(algorithm) + "}" + LangUtils.joinStrings(":", StringUtils.upperCase(prfName), LangUtils.toString(iterations), LangUtils.base64Encode(salt), digestString);
 	}
 }
