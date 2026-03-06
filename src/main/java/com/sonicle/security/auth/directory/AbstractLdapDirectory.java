@@ -40,7 +40,9 @@ import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
@@ -151,9 +153,8 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 	}
 	
 	@Override
-	public List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
+	public Map<String, AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
 		AbstractLdapConfigBuilder builder = getConfigBuilder();
-		ArrayList<AuthUser> entries = new ArrayList<>();
 		
 		try {
 			ensureCapability(DirectoryCapability.USERS_READ);
@@ -164,8 +165,10 @@ public abstract class AbstractLdapDirectory extends AbstractDirectory {
 			ConnectionFactory conFactory = createConnectionFactory(opts, true);
 			Collection<LdapEntry> ldEntries = ldapSearch(conFactory, baseDn, filter, attrs);
 			
-			for(LdapEntry ldEntry : ldEntries) {
-				entries.add(createUserEntry(opts, ldEntry));
+			LinkedHashMap<String, AuthUser> entries = new LinkedHashMap<>();
+			for (LdapEntry ldEntry : ldEntries) {
+				final AuthUser entry = createUserEntry(opts, ldEntry);
+				entries.put(entry.userId, entry);
 			}
 			return entries;
 		

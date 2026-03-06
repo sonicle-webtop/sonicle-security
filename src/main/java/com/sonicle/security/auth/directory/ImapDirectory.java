@@ -34,7 +34,6 @@ package com.sonicle.security.auth.directory;
 
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.security.AuthPrincipal;
-import com.sonicle.security.Principal;
 import com.sonicle.security.ConnectionSecurity;
 import com.sonicle.security.auth.DirectoryException;
 import com.sonicle.security.auth.EntryException;
@@ -48,6 +47,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.NoSuchProviderException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +123,7 @@ public class ImapDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
+	public Map<String, AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
 		throw new DirectoryException("Capability not supported");
 	}
 

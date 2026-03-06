@@ -40,6 +40,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -57,7 +58,7 @@ public interface Directory {
 	public abstract char[] generatePassword(final DirectoryOptions opts);
 	public abstract AuthUser exist(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException;
 	public abstract AuthUser authenticate(final DirectoryOptions opts, final AuthPrincipal principal) throws DirectoryException;
-	public abstract List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException;
+	public abstract Map<String, AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException;
 	public abstract void addUser(final DirectoryOptions opts, final String domainId, final AuthUser entry) throws EntryException, DirectoryException;
 	public abstract void updateUser(final DirectoryOptions opts, String domainId, final AuthUser entry) throws DirectoryException;
 	public abstract void updateUserPassword(final DirectoryOptions opts, final String domainId, final String userId, final char[] newPassword) throws DirectoryException;

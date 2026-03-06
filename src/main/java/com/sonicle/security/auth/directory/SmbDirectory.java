@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -126,7 +127,7 @@ public class SmbDirectory extends AbstractDirectory {
 	}
 
 	@Override
-	public List<AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
+	public Map<String, AuthUser> listUsers(final DirectoryOptions opts, final String domainId) throws DirectoryException {
 		throw new DirectoryException("Not supported");
 	}
 
