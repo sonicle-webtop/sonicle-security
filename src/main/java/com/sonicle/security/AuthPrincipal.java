@@ -40,11 +40,11 @@ public class AuthPrincipal extends Principal {
 	private char[] password = null;
 	
 	public AuthPrincipal(final String domain, final String local) {
-		this(false, domain, local, null);
+		this(false, false, domain, local, null);
 	}
 	
-	public AuthPrincipal(final boolean impersonated, final String domain, final String local, final char[] password) {
-		super(impersonated, domain, local);
+	public AuthPrincipal(final boolean impersonated, final boolean remembered, final String domain, final String local, final char[] password) {
+		super(impersonated, remembered, domain, local);
 		this.password = password;
 	}
 	

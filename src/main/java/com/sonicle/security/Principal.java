@@ -47,23 +47,29 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class Principal implements java.security.Principal, Serializable {
 	private final boolean impersonated;
+	private final boolean remembered;
 	private final String name;
 	private final String hashedName;
 	private String displayName = null;
 	private AbstractDirectory.AuthUser directoryEntry = null;
 	
 	public Principal(final String domain, final String local) {
-		this(false, domain, local);
+		this(false, false, domain, local);
 	}
 	
-	public Principal(final boolean impersonated, final String domain, final String local) {
+	public Principal(final boolean impersonated, final boolean remembered, final String domain, final String local) {
 		this.impersonated = impersonated;
+		this.remembered = remembered;
 		this.name = DomainAccount.buildFullyQualifiedName(domain, local);
 		this.hashedName = Principal.buildHashedName(this.name);
 	}
 	
 	public boolean isImpersonated() {
 		return impersonated;
+	}
+	
+	public boolean isRemembered() {
+		return remembered;
 	}
 	
 	/**
