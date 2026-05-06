@@ -32,6 +32,7 @@
  */
 package com.sonicle.security.auth.directory;
 
+import com.sonicle.commons.Check;
 import com.sonicle.commons.EnumUtils;
 import com.sonicle.commons.RegexUtils;
 import com.sonicle.security.AuthPrincipal;
@@ -44,7 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.ldaptive.AddOperation;
 import org.ldaptive.AddRequest;

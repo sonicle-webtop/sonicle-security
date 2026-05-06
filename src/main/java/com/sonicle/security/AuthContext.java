@@ -32,9 +32,9 @@
  */
 package com.sonicle.security;
 
+import com.sonicle.commons.Check;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.sf.qualitycheck.Check;
 
 /**
  *

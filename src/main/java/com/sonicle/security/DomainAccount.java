@@ -32,8 +32,8 @@
  */
 package com.sonicle.security;
 
+import com.sonicle.commons.Check;
 import com.sonicle.commons.LangUtils;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

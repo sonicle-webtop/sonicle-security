@@ -32,11 +32,10 @@
  */
 package com.sonicle.security;
 
+import com.sonicle.commons.Check;
 import com.sonicle.commons.EnumUtils;
-import com.sonicle.commons.LangUtils;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 
 /**

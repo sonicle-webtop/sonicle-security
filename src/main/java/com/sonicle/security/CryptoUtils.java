@@ -33,6 +33,7 @@
 package com.sonicle.security;
 
 import com.sonicle.commons.Base58;
+import com.sonicle.commons.Check;
 import com.sonicle.commons.LangUtils;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -58,7 +59,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.ASN1InputStream;
