@@ -34,9 +34,8 @@ package com.sonicle.security;
 
 import com.sonicle.commons.Check;
 import com.sonicle.commons.LangUtils;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  *
@@ -98,21 +97,17 @@ public class DomainAccount {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(domain)
-			.append(local)
-			.toHashCode();
+		return Objects.hash(domain, local);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof DomainAccount == false) return false;
 		if (this == obj) return true;
-		final DomainAccount otherObject = (DomainAccount) obj;
-		return new EqualsBuilder()
-			.append(domain, otherObject.domain)
-			.append(local, otherObject.local)
-			.isEquals();
+		if (!(obj instanceof DomainAccount)) return false; // Allow subclass equality
+		
+		final DomainAccount otherObject = (DomainAccount)obj;
+		return Objects.equals(domain, otherObject.domain)
+			&& Objects.equals(local, otherObject.local);
 	}
 	
 	public static String buildFullyQualifiedName(final String domain, final String local) {

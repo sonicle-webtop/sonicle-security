@@ -34,10 +34,9 @@ package com.sonicle.security;
 
 import com.sonicle.security.auth.directory.AbstractDirectory;
 import java.io.Serializable;
+import java.util.Objects;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * This interface represents the abstract notion of a principal, which can be
@@ -174,19 +173,16 @@ public class Principal implements java.security.Principal, Serializable {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(name)
-			.toHashCode();
+		return Objects.hash(name);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Principal == false) return false;
 		if (this == obj) return true;
-		final Principal otherObject = (Principal) obj;
-		return new EqualsBuilder()
-			.append(name, otherObject.name)
-			.isEquals();
+		if (!(obj instanceof Principal)) return false; // Allow subclass equality
+		
+		final Principal otherObject = (Principal)obj;
+		return Objects.equals(name, otherObject.name);
 	}
 	
 	public static String buildHashedName(String name) {
